@@ -1,0 +1,29 @@
+# Global ignores for macOS
+.DS_Store
+
+# Node.js (Vue.js) ignores
+front/node_modules/
+front/dist/
+
+# Vue CLI specific ignores
+front/.env.local
+front/.env.*.local
+front/.output/
+
+# Compiled source and logs
+front/npm-debug.log*
+front/yarn-debug.log*
+front/yarn-error.log*
+
+# Spring Boot ignores
+back/target/
+back/.idea/
+back/.project
+back/.classpath
+back/.settings/
+back/*.iml
+back/*.log
+
+# OS-specific temporary files
+Thumbs.db
+Desktop.ini
