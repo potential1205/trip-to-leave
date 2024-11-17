@@ -46,7 +46,7 @@
 
                             <!-- add card -->
                             <div class="col-3 mb-5">
-                                <router-link to="/postalbum" class="nav-link">
+                                <router-link to="/main/postalbum" class="nav-link">
                                 <div class="card d-sm-flex justify-content-center align-items-center"
                                     style="background-color: #E9E9E9;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#757575"

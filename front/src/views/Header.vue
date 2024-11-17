@@ -11,9 +11,9 @@
 
     <!-- Center: Navigation Menu -->
     <nav class="nav-menu d-flex">
-      <router-link to="/" class="nav-link" active-class="active-link">여행지 검색</router-link>
-      <router-link to="/album" class="nav-link" active-class="active-link">여행첩</router-link>
-      <router-link to="/board" class="nav-link" active-class="active-link">게시판</router-link>
+      <router-link to="/main" class="nav-link" active-class="active-link" exact>여행지 검색</router-link>
+      <router-link to="/main/album" class="nav-link" active-class="active-link" exact>여행첩</router-link>
+      <router-link to="/main/board" class="nav-link" active-class="active-link" exact>게시판</router-link>
     </nav>
 
     <!-- Right: User Profile -->
@@ -29,8 +29,8 @@
       </span>
       <!-- Dropdown Menu -->
       <div v-if="dropdownOpen" class="dropdown-menu position-absolute end-0 mt-2 shadow">
-        <router-link to="/mypage" class="nav-link dropdown-item">마이페이지</router-link>
-        <router-link to="/myalbum" class="nav-link dropdown-item">나의 여행첩</router-link>
+        <router-link to="/main/mypage" class="nav-link dropdown-item" >마이페이지</router-link>
+        <router-link to="/main/myalbum" class="nav-link dropdown-item">나의 여행첩</router-link>
         <router-link class="nav-link dropdown-item">로그아웃</router-link>
       </div>
     </div>

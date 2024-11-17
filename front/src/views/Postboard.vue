@@ -55,7 +55,7 @@
                             <!-- 작성 및 취소 버튼 -->
                             <div class="d-flex justify-content-end">
                                 <!-- 취소 버튼 -->
-                                <router-link to="/board" class="btn btn-secondary me-2">취소</router-link>
+                                <router-link to="/main/board" class="btn btn-secondary me-2">취소</router-link>
 
                                 <!-- 작성 버튼 -->
                                 <button type="submit" class="btn btn-primary me-2">작성</button>

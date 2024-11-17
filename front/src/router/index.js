@@ -2,47 +2,52 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  linkExactActiveClass: 'active-link', // 정확히 일치할 때만 active-class 적용,
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('../views/Search.vue'), // 홈 경로에 Search 컴포넌트 연결
+      name: 'login',
+      component: () => import('../views/LoginPageView.vue'), // 로그인 페이지
     },
     {
-      path: '/album',
-      name: 'album',
-      // 이 경로는 lazy-loading 방식으로 Album 컴포넌트를 로드
-      component: () => import('../views/Album.vue'),
-    },
-    {
-      path: '/board',
-      name: 'board',
-      // 이 경로는 lazy-loading 방식으로 Album 컴포넌트를 로드
-      component: () => import('../views/Board.vue'),
-    },
-    {
-      path: '/mypage',
-      name: 'mypage',
-      // 이 경로는 lazy-loading 방식으로 Album 컴포넌트를 로드
-      component: () => import('../views/Mypage.vue'),
-    },
-    {
-      path: '/myalbum',
-      name: 'myalbum',
-      // 이 경로는 lazy-loading 방식으로 Album 컴포넌트를 로드
-      component: () => import('../views/Myalbum.vue'),
-    },
-    {
-      path: '/postboard',
-      name: 'postboard',
-      // 이 경로는 lazy-loading 방식으로 Album 컴포넌트를 로드
-      component: () => import('../views/Postboard.vue'),
-    },
-    {
-      path: '/postalbum',
-      name: 'postalbum',
-      // 이 경로는 lazy-loading 방식으로 Album 컴포넌트를 로드
-      component: () => import('../views/Postalbum.vue'),
+      path: '/main',
+      children: [
+        {
+          path: '',
+          name: 'main',
+          component: () => import('../views/Search.vue'), // 기본 하위 경로: /main
+        },
+        {
+          path: 'album',
+          name: 'album',
+          component: () => import('../views/Album.vue'),
+        },
+        {
+          path: 'board',
+          name: 'board',
+          component: () => import('../views/Board.vue'),
+        },
+        {
+          path: 'mypage',
+          name: 'mypage',
+          component: () => import('../views/Mypage.vue'),
+        },
+        {
+          path: 'myalbum',
+          name: 'myalbum',
+          component: () => import('../views/Myalbum.vue'),
+        },
+        {
+          path: 'postboard',
+          name: 'postboard',
+          component: () => import('../views/Postboard.vue'),
+        },
+        {
+          path: 'postalbum',
+          name: 'postalbum',
+          component: () => import('../views/Postalbum.vue'),
+        },
+      ],
     },
   ],
 });
