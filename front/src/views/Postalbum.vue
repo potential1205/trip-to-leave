@@ -125,7 +125,6 @@ const previewContainer = ref(null);
 const scrollToHeading = (id) => {
     if (previewContainer.value) {
         const targetElement = previewContainer.value.querySelector(`#${id}`);
-
         if (targetElement) {
             targetElement.scrollIntoView({
                 behavior: 'smooth', // 부드럽게 스크롤
