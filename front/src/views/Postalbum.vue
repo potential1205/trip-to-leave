@@ -106,8 +106,8 @@
                         <!-- 해시태그 입력 -->
                         <div class="mb-3">
                             <label for="post-hashtags" class="form-label">해시태그</label>
-                            <div class="d-flex align-items-center">
-                                <input id="post-hashtags" type="text" v-model="newHashtag" class="form-control me-2"
+                            <div class="input-group">
+                                <input id="post-hashtags" type="text" v-model="newHashtag" class="form-control"
                                     placeholder="해시태그를 입력하세요" />
                                 <button class="btn btn-primary" @click="addHashtag">추가</button>
                             </div>
@@ -335,7 +335,6 @@ const cancelLocationSelection = () => {
 
 <style scoped>
 .markdown-editor {
-    border: 1px solid #ccc;
     padding: 1rem;
     position: relative;
 }
