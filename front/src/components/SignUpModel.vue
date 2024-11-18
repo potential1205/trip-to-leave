@@ -84,10 +84,10 @@
     font-size: 16px;
     border-radius: 4px;
     border: 1px solid #ccc;
-  }W
+  }
   
   .btn-secondary {
-    white-space: nowrap;
+    white-space: nowrap; 
   }
   
   </style>

@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  linkExactActiveClass: 'active-link', // 정확히 일치할 때만 active-class 적용,
+  linkExactActiveClass: 'active-link', // 정확히 일치할 때만 active-class 적용
   routes: [
     {
       path: '/',
@@ -28,6 +28,18 @@ const router = createRouter({
           component: () => import('../views/Board.vue'),
         },
         {
+          path: 'board/:id',
+          name: 'boardDetail',
+          component: () => import('../views/BoardDetail.vue'),
+          props: true,
+        },
+        {
+          path: 'board/edit/:id',
+          name: 'editBoard',
+          component: () => import('../views/EditBoard.vue'),
+          props: true,
+        },
+        {
           path: 'mypage',
           name: 'mypage',
           component: () => import('../views/Mypage.vue'),
@@ -47,9 +59,15 @@ const router = createRouter({
           name: 'postalbum',
           component: () => import('../views/Postalbum.vue'),
         },
+        {
+          path: 'album/:id',
+          name: 'albumDetail',
+          component: () => import('../views/AlbumDetail.vue'),
+          props: true,
+        },
       ],
     },
   ],
-});
+})
 
-export default router;
+export default router
