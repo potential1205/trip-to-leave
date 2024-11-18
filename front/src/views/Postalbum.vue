@@ -154,7 +154,7 @@
 
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watchEffect } from 'vue';
 import { marked } from 'marked';
 
 // 해시태그 관련 상태
@@ -251,16 +251,19 @@ const markdown = ref('# 제목 1\n## 제목 2\n### 제목 3');
 // 렌더링된 HTML
 const renderedMarkdown = computed(() => marked(markdown.value));
 
-// 목차 생성
-const headings = computed(() => {
+// 목차 동적 업데이트를 위한 `headings`
+const headings = ref([]);
+
+// `watchEffect`로 `headings` 업데이트
+watchEffect(() => {
     const lines = markdown.value.split('\n');
-    return lines
+    headings.value = lines
         .filter((line) => line.startsWith('#'))
         .map((line) => {
             const level = line.match(/^#+/)[0].length;
             const text = line.replace(/^#+\s*/, '');
             const id = text.toLowerCase().replace(/ /g, '-');
-            return { level, text, id, locations: [] }; // locations 필드 추가
+            return { level, text, id, locations: [] }; // locations 필드 포함
         });
 });
 
