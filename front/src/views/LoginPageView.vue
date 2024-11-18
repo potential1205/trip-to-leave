@@ -62,9 +62,9 @@
   
   .logo {
     position: absolute;
-    top: 125px; 
+    top: 110px; 
     z-index: 4;
-    width: 200px;
+    width: 300px;
     left: 50%;
     transform: translateX(-50%);
   
