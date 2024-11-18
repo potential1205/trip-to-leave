@@ -9,11 +9,13 @@
             <p class="text-center fw-bold">{{ album.dateRange }}</p>
             <p class="text-center fw-bold">{{ album.author }}</p>
   
+            <!-- 이미지 섹션 -->
             <div v-if="album.imageUrl" class="mb-3 text-center">
               <img :src="album.imageUrl" alt="앨범 이미지" class="img-fluid rounded" style="width: 50vw;" />
             </div>
   
-            <div v-html="album.markdown" class="markdown-content border p-3"></div>
+            <!-- 마크다운 내용 -->
+            <div v-html="renderedMarkdown" class="markdown-content border p-3"></div>
           </div>
         </div>
   
@@ -23,10 +25,12 @@
   </template>
   
   <script setup>
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, computed } from 'vue';
   import { useRoute } from 'vue-router';
+  import { marked } from 'marked';
   
   const route = useRoute();
+  
   const album = ref({
     id: '',
     title: '',
@@ -36,13 +40,16 @@
     imageUrl: ''
   });
   
+  // 렌더링된 마크다운 내용
+  const renderedMarkdown = computed(() => marked(album.value.markdown));
+  
   onMounted(() => {
     album.value = {
-      id: route.params.id,
-      title: route.query.title || '제목 없음',
-      dateRange: route.query.dateRange || '기간 없음',
-      author: route.query.author || '작성자 없음',
-      markdown: route.query.markdown || '',
+      id: route.params.id || '0',
+      title: route.query.title || '히히 테스트 데이터',
+      dateRange: route.query.dateRange || '기간은 몰?루',
+      author: route.query.author || 'sangwawa',
+      markdown: route.query.markdown || '내용이 없습니다.',
       imageUrl: route.query.imageUrl || '@/assets/images/default.jpg'
     };
   });
