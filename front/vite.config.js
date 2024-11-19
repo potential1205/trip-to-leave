@@ -7,15 +7,20 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vite.dev/config/
 export default defineConfig({
   optimizeDeps: {
-    include: ['marked']
+    include: ['marked'],
   },
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
+  plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  server: {
+    proxy: {
+      '/v1': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
     },
   },
 })
