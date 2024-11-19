@@ -1,11 +1,43 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 
 const mapContainer = ref(null)
+let mapInstance = null 
+let markers = [] 
 
-onMounted(() => {
-  loadKakaoMap(mapContainer.value)
+
+const props = defineProps({
+  markersData: {
+    type: Array,
+    default: () => [],
+  },
 })
+
+
+const addMarker = (position, title) => {
+  const marker = new window.kakao.maps.Marker({
+    position,
+    title,
+    map: mapInstance,
+  })
+  markers.push(marker)
+}
+
+
+const clearMarkers = () => {
+  markers.forEach(marker => marker.setMap(null))
+  markers = []
+}
+
+
+const updateMarkers = () => {
+  clearMarkers()
+  props.markersData.forEach(markerData => {
+    const position = new window.kakao.maps.LatLng(markerData.lat, markerData.lng)
+    addMarker(position, markerData.title)
+  })
+}
+
 
 const loadKakaoMap = (container) => {
   const script = document.createElement('script')
@@ -15,15 +47,23 @@ const loadKakaoMap = (container) => {
   script.onload = () => {
     window.kakao.maps.load(() => {
       const options = {
-        center: new window.kakao.maps.LatLng(37.501426, 127.039567), // 지도 중심 좌표
-        level: 3, // 지도 확대 레벨
-        maxLevel: 5, // 지도 축소 제한 레벨
+        center: new window.kakao.maps.LatLng(37.501426, 127.039567), 
+        level: 3, 
+        maxLevel: 5, 
       }
-
-      const mapInstance = new window.kakao.maps.Map(container, options) // 지도 생성
+      mapInstance = new window.kakao.maps.Map(container, options) 
+      updateMarkers() 
     })
   }
 }
+
+
+watch(() => props.markersData, updateMarkers)
+
+
+onMounted(() => {
+  loadKakaoMap(mapContainer.value)
+})
 </script>
 
 <template>
