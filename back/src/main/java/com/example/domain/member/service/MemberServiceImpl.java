@@ -28,6 +28,12 @@ public class MemberServiceImpl implements MemberService {
     private String senderEmail;
 
     public void joinEmailAuth(String email) {
+        Member duplicatedMember = memberMapper.findByEmail(email);
+
+        if (duplicatedMember != null) {
+            throw new BusinessException("이미 사용중인 이메일입니다.");
+        }
+
         Random random = new Random();
         String authCode = String.valueOf(100000 + random.nextInt(900000)); // 100000 ~ 999999 범위
 

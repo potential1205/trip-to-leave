@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin("*")
 @RequestMapping("/member")
 public class MemberController {
 
@@ -36,7 +37,7 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<SuccessResp> login(@RequestBody LoginReq req) {
-
+        System.out.println("login");
         memberService.login(req.getEmail(), req.getPassword());
 
         return ResponseEntity.ok(
