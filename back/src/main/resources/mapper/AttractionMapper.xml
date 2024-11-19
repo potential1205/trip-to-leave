@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.domain.Attraction.mapper.AttractionMapper">
+
+    <resultMap id="AttractionResultMap" type="com.example.domain.Attraction.vo.Attraction">
+        <id property="no" column="no"/>
+        <result property="contentId" column="content_id"/>
+        <result property="title" column="title"/>
+        <result property="contentTypeId" column="content_type_id"/>
+        <result property="areaCode" column="area_code"/>
+        <result property="siGunGuCode" column="si_gun_gu_code"/>
+        <result property="firstImage1" column="first_image1"/>
+        <result property="firstImage2" column="first_image2"/>
+        <result property="mapLevel" column="map_level"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+        <result property="tel" column="tel"/>
+        <result property="addr1" column="addr1"/>
+        <result property="addr2" column="addr2"/>
+        <result property="homepage" column="homepage"/>
+        <result property="overview" column="overview"/>
+    </resultMap>
+
+    <!-- 특정 지역 코드에 해당하는 관광명소 조회 -->
+    <select id="getAreaAttractions" resultMap="AttractionResultMap">
+        SELECT *
+        FROM attractions
+        WHERE area_code = #{areacode}
+    </select>
+
+    <!-- 특정 시군구 코드에 해당하는 관광명소 조회 -->
+    <select id="getSigunguAttractions" resultMap="AttractionResultMap">
+        SELECT *
+        FROM attractions
+        WHERE area_code = #{areacode}
+          AND si_gun_gu_code = #{sigungucode}
+    </select>
+
+    <!-- 특정 지역코드에 해당하는 관광타입에 대한 관광지 조회 -->
+    <select id="getAreaContentAttractions" resultMap="AttractionResultMap">
+        SELECT *
+        FROM attractions
+        WHERE area_code = #{areacode}
+          AND content_type_id = #{contenttypeid}
+    </select>
+
+    <!-- 특정 시군구 코드에 해당하는 관광타입에 대한 관광명소 조회 -->
+    <select id="getSigunguContentAttractions" resultMap="AttractionResultMap">
+        SELECT *
+        FROM attractions
+        WHERE area_code = #{areacode}
+          AND si_gun_gu_code = #{sigungucode}
+          AND content_type_id = #{contenttypeid}
+    </select>
+
+    <!-- 검색 조건에 따른 관광명소 조회 -->
+    <select id="searchAttractions" parameterType="map" resultMap="AttractionResultMap">
+        SELECT *
+        FROM attractions
+        WHERE area_code = #{areacode}
+        <if test="sigungucode != null">
+            AND si_gun_gu_code = #{sigungucode}
+        </if>
+        <if test="contenttypeid != null">
+            AND content_type_id = #{contenttypeid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+    </select>
+
+</mapper>
