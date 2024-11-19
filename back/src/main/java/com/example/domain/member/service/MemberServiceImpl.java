@@ -85,19 +85,21 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void login(String email, String password) {
+    public Member login(String email, String password) {
         Member member = memberMapper.findByEmailAndPassword(email, password);
 
         if (member == null) {
             throw new DataBaseException("존재하는 회원이 없거나 비밀번호가 일치하지않습니다");
         }
 
-        session.setAttribute("member", member);
+        return member;
     }
 
     @Override
     public void logout() {
         Member member = (Member) session.getAttribute("member");
+
+        System.out.println(member);
 
         if (member == null) {
             throw new DataBaseException("접근할 수 없습니다.");

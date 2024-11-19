@@ -3,13 +3,15 @@ package com.example.domain.member.controller;
 import com.example.domain.global.resp.SuccessResp;
 import com.example.domain.member.req.*;
 import com.example.domain.member.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin("*")
+@CrossOrigin("http://localhost:5173")
 @RequestMapping("/member")
 public class MemberController {
 
@@ -36,8 +38,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<SuccessResp> login(@RequestBody LoginReq req) {
-        System.out.println("login");
+    public ResponseEntity<SuccessResp> login(@RequestBody LoginReq req, HttpServletRequest request) {
         memberService.login(req.getEmail(), req.getPassword());
 
         return ResponseEntity.ok(
@@ -46,7 +47,10 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<SuccessResp> logout() {
+    public ResponseEntity<SuccessResp> logout(HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        System.out.println(session.getAttribute("member"));
 
         memberService.logout();
 
