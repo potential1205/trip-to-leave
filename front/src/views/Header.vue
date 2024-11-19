@@ -29,24 +29,26 @@
       </span>
       <!-- Dropdown Menu -->
       <div v-if="dropdownOpen" class="dropdown-menu position-absolute end-0 mt-2 shadow">
-        <router-link to="/main/mypage" class="nav-link dropdown-item" >마이페이지</router-link>
+        <router-link to="/main/mypage" class="nav-link dropdown-item">마이페이지</router-link>
         <router-link to="/main/myalbum" class="nav-link dropdown-item">나의 여행첩</router-link>
-        <router-link class="nav-link dropdown-item">로그아웃</router-link>
+        <butoon @click.prevent="handleLogout" class="nav-link dropdown-item">로그아웃</butoon>
       </div>
     </div>
   </div>
-    
-</template>
-  
-<style scoped>
 
+</template>
+
+<style scoped>
 .nav-menu .nav-link.active-link {
-  font-weight: bold; /* 활성화된 링크의 굵은 글씨 처리 */
-  color: #007bff; /* 선택된 링크에 다른 색상 적용 */
+  font-weight: bold;
+  /* 활성화된 링크의 굵은 글씨 처리 */
+  color: #007bff;
+  /* 선택된 링크에 다른 색상 적용 */
 }
 
-.header{
-  position: relative; /* 드롭다운 메뉴와의 위치 관계를 명확히 */
+.header {
+  position: relative;
+  /* 드롭다운 메뉴와의 위치 관계를 명확히 */
   z-index: 10;
 }
 
@@ -77,8 +79,10 @@
   border-radius: 5px;
   padding: 10px 0;
   width: 150px;
-  top: 100%; /* Dropdown 위치를 부모 요소의 아래로 설정 */
-  right: 0; /* 오른쪽 정렬 */
+  top: 100%;
+  /* Dropdown 위치를 부모 요소의 아래로 설정 */
+  right: 0;
+  /* 오른쪽 정렬 */
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -104,6 +108,9 @@
 
 <script setup>
 import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const dropdownOpen = ref(false);
 
@@ -117,5 +124,20 @@ const closeDropdown = (event) => {
   }
 };
 
+const handleLogout = async () => {
+  try {
+    // 로그아웃 요청
+    await axios.post('http://localhost:8080/member/logout', null, {
+      withCredentials: true,
+    });
+    alert('로그아웃 되었습니다.');
+
+    // 로그아웃 성공 후 홈 페이지로 이동
+    router.push('/');
+  } catch (error) {
+    console.error('로그아웃 실패:', error.response?.data || error.message);
+    alert('로그아웃 중 문제가 발생했습니다. 다시 시도하세요.');
+  }
+};
 
 </script>
