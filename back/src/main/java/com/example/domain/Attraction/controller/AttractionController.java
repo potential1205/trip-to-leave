@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/attractions")
 public class AttractionController {
     private final AttractionService attractionService;

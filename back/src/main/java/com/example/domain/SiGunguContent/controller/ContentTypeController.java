@@ -4,6 +4,7 @@ import com.example.domain.SiGunguContent.sigungumapper.ContentTypeMapper;
 import com.example.domain.SiGunguContent.vo.ContentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/contenttypes")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class ContentTypeController {
     private final ContentTypeMapper contentTypeMapper;
