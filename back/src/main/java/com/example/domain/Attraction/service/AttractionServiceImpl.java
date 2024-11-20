@@ -1,11 +1,14 @@
 package com.example.domain.Attraction.service;
 
+import com.example.domain.Attraction.controller.AttractionController;
 import com.example.domain.Attraction.dto.AttractionDto;
 import com.example.domain.Attraction.mapper.AttractionDtoMapper;
 import com.example.domain.Attraction.mapper.AttractionMapper;
 import com.example.domain.Attraction.vo.Attraction;
 import com.example.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,7 @@ public class AttractionServiceImpl implements AttractionService {
 
     private final AttractionMapper attractionMapper;
     private final AttractionDtoMapper dtoMapper;
+    private static final Logger logger = LoggerFactory.getLogger(AttractionController.class);
 
     @Override
     public List<AttractionDto> getAreaAttractions(Integer areaCode) {
@@ -61,5 +65,15 @@ public class AttractionServiceImpl implements AttractionService {
             throw new ResourceNotFoundException("검색 결과가 없습니다.");
         }
         return attractions.stream().map(dtoMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public AttractionDto getAttractionById(Integer id) {
+        Attraction attraction = attractionMapper.getAttractionById(id);
+        if (attraction == null) {
+            throw new ResourceNotFoundException("Attraction not found with ID: " + id);
+        }
+        logger.info("Fetched Attraction from Mapper: {}", attraction);
+        return dtoMapper.toDto(attraction);
     }
 }

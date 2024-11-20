@@ -72,4 +72,11 @@
         </if>
     </select>
 
+    <!-- 특정 ID에 해당하는 관광명소 조회 -->
+    <select id="getAttractionById" resultMap="AttractionResultMap">
+        SELECT *
+        FROM attractions
+        WHERE content_id = #{id}
+    </select>
+
 </mapper>

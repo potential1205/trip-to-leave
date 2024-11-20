@@ -18,4 +18,6 @@ public interface AttractionMapper {
     List<Attraction> getSigunguContentAttractions(@Param("areacode") Integer areaCode, @Param("sigungucode") Integer sigunguCode, @Param("contenttypeid") Integer contentTypeId);
 
     List<Attraction> searchAttractions(@Param("areacode") Integer areacode, @Param("sigungucode") Integer sigungucode, @Param("contenttypeid") Integer contenttypeid, @Param("keyword") String keyword);
+
+    Attraction getAttractionById(@Param("id") Integer id);
 }
