@@ -141,11 +141,17 @@ public class MemberController {
     }
 
     @GetMapping("/session")
-    public ResponseEntity<Boolean> readSession(HttpServletRequest request) {
+    public ResponseEntity<Integer> readSession(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // 세션이 없으면 null 반환
-        boolean isLoggedIn = session != null && session.getAttribute("member") != null;
 
-        return ResponseEntity.ok(isLoggedIn);
+        Integer resp = null;
+
+        if (session != null && session.getAttribute("member") != null) {
+            Member member = (Member) session.getAttribute("member");
+            resp = member.getMemberId();
+        }
+
+        return ResponseEntity.ok(resp);
     }
 
 }

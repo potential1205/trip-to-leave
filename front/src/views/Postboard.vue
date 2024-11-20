@@ -16,55 +16,46 @@
                                 <h5>게시글 작성</h5>
                             </div>
 
-                            <!-- 카테고리 선택 -->
-                            <div class="col-2">
-                                <select class="form-select" aria-label="카테고리 선택">
-                                    <option selected>카테고리</option>
-                                    <option value="hashtag">문의</option>
-                                    <option value="keyword">버그제보</option>
-                                    <!-- Add more options as needed -->
-                                </select>
-                            </div>
-
                         </div>
                     </div>
                 </div>
                 <!-- Bottom Section (5/6) -->
                 <div class="flex-item flex-bottom d-flex flex-column p-3">
                     <div class="post-form-section border p-3">
-                        <form>
+                        <form @submit="handleSubmit">
                             <!-- 제목 입력 -->
                             <div class="mb-3">
                                 <label for="post-title" class="form-label">제목</label>
-                                <input type="text" id="post-title" class="form-control" placeholder="제목을 입력하세요" />
+                                <input type="text" id="post-title" class="form-control" placeholder="제목을 입력하세요"
+                                    v-model="title" />
+                            </div>
+
+                            <!-- 카테고리 선택 -->
+                            <div class="mb-3">
+                                <label for="post-category" class="form-label">카테고리</label>
+                                <select id="post-category" class="form-select" v-model="category">
+                                    <option value="">카테고리 선택</option>
+                                    <option value="문의">문의</option>
+                                    <option value="버그제보">버그제보</option>
+                                </select>
                             </div>
 
                             <!-- 내용 입력 -->
                             <div class="mb-3">
                                 <label for="post-content" class="form-label">내용</label>
-                                <textarea id="post-content" class="form-control" rows="8"
-                                    placeholder="내용을 입력하세요"></textarea>
+                                <textarea id="post-content" class="form-control" rows="8" placeholder="내용을 입력하세요"
+                                    v-model="content"></textarea>
                             </div>
 
                             <!-- 파일 첨부 -->
                             <div class="mb-3">
                                 <label for="post-file" class="form-label">파일 첨부</label>
-                                <input type="file" id="post-file" class="form-control" />
+                                <input type="file" id="post-file" class="form-control" @change="handleFileChange" />
                             </div>
 
-                            <!-- 작성 및 취소 버튼 -->
+                            <!-- 작성 버튼 -->
                             <div class="d-flex justify-content-end">
-                                <!-- 취소 버튼 -->
-                                <router-link to="/main/board" class="btn btn-secondary me-2">취소</router-link>
-
-                                <!-- 작성 버튼 -->
-                                <button type="submit" class="btn btn-primary me-2">작성</button>
-
-                                <!-- 수정 버튼 -->
-                                <router-link class="btn btn-warning me-2">수정</router-link>
-
-                                <!-- 삭제 버튼 -->
-                                <button type="submit" class="btn btn-danger">삭제</button>
+                                <button type="submit" class="btn btn-primary">작성</button>
                             </div>
                         </form>
                     </div>
@@ -79,7 +70,58 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+// Form 데이터
+const title = ref('');
+const category = ref('');
+const content = ref('');
+const file = ref(null);
+const router = useRouter();
+
+// 파일 변경 시 처리
+const handleFileChange = (event) => {
+    file.value = event.target.files[0]; // 파일 선택
+};
+
+// 게시글 작성 처리
+const handleSubmit = async (event) => {
+    event.preventDefault(); // 기본 폼 제출 방지
+
+    if (!title.value || !category.value || !content.value) {
+        alert('모든 필드를 입력하세요.');
+        return;
+    }
+
+    // FormData 객체 생성
+    const formData = new FormData();
+    formData.append('title', title.value);
+    formData.append('category', category.value);
+    formData.append('content', content.value);
+    if (file.value) {
+        formData.append('files', file.value); // 파일 첨부
+    }
+
+    try {
+        // 서버로 요청 전송
+        const response = await axios.post('http://localhost:8080/articles', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            withCredentials: true, // 세션 쿠키 포함
+        });
+
+        if (response.status === 200) {
+            alert('게시글 작성이 완료되었습니다.');
+            router.push('/main/board'); // 게시판으로 이동
+        }
+    } catch (error) {
+        console.error('게시글 작성 실패:', error.response?.data || error.message);
+        alert('게시글 작성 중 문제가 발생했습니다.');
+    }
+};
 </script>
+
 
 <style scoped>
 .body-container {

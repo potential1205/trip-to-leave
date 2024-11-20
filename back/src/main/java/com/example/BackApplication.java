@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @MapperScan(basePackages = {
         "com.example.domain.Attraction.mapper",
         "com.example.domain.SiGunguContent.sigungumapper",
-        "com.example.domain.member.mapper"
+        "com.example.domain.member.mapper",
+        "com.example.domain.article.mapper"
 })
 @SpringBootApplication(scanBasePackages = {"com.example"})
 public class BackApplication {
