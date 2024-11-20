@@ -1,16 +1,24 @@
 package com.example.domain.Attraction.mapper;
 
+import com.example.domain.Attraction.controller.AttractionController;
 import com.example.domain.Attraction.dto.AttractionDto;
 import com.example.domain.Attraction.vo.Attraction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AttractionDtoMapper {
+    private static final Logger logger = LoggerFactory.getLogger(AttractionController.class);
 
     public AttractionDto toDto(Attraction attraction) {
         if (attraction == null) {
             return null;
         }
+
+        logger.info("Mapping Attraction to DTO: firstImage1={}, firstImage2={}",
+                attraction.getFirstImage1(), attraction.getFirstImage2());
+
         AttractionDto dto = new AttractionDto();
         dto.setContentId(attraction.getContentId());
         dto.setTitle(attraction.getTitle());
@@ -31,3 +39,4 @@ public class AttractionDtoMapper {
         return dto;
     }
 }
+

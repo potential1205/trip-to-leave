@@ -4,6 +4,8 @@ package com.example.domain.Attraction.controller;
 import com.example.domain.Attraction.dto.AttractionDto;
 import com.example.domain.Attraction.service.AttractionService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequestMapping("/attractions")
 public class AttractionController {
     private final AttractionService attractionService;
+    private static final Logger logger = LoggerFactory.getLogger(AttractionController.class);
 
     // 특정 지역 코드에 해당하는 관광명소 조회
     @GetMapping("/area/{areacode}")
@@ -64,5 +67,15 @@ public class AttractionController {
     ) {
         List<AttractionDto> attractions = attractionService.searchAttractions(areacode, sigungucode, contenttypeid, keyword);
         return ResponseEntity.ok(attractions);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AttractionDto> getAttractionById(@PathVariable("id") Integer id) {
+        logger.info("Attraction 조회 요청: ID={}", id);
+        AttractionDto attraction = attractionService.getAttractionById(id);
+
+        logger.info("Attraction DTO to be returned: {}", attraction);
+
+        return ResponseEntity.ok(attraction);
     }
 }

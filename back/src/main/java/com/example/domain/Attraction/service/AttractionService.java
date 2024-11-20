@@ -15,4 +15,6 @@ public interface AttractionService {
     List<AttractionDto> getSigunguContentAttractions(Integer areaCode, Integer sigunguCode, Integer contentTypeId);
 
     List<AttractionDto> searchAttractions(Integer areacode, Integer sigungucode, Integer contenttypeid, String keyword);
+
+    AttractionDto getAttractionById(Integer id);
 }

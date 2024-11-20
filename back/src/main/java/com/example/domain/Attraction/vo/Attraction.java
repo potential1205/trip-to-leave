@@ -10,8 +10,8 @@ public class Attraction {
     private Integer contentTypeId;
     private Integer areaCode;
     private Integer siGunGuCode;
-    private String firstImage1;
-    private String firstImage2;
+    private String firstImage1 = ""; // 기본값 설정
+    private String firstImage2 = ""; // 기본값 설정
     private Integer mapLevel;
     private Double latitude;
     private Double longitude;
