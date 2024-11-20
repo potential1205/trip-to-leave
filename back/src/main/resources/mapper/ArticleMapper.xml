@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.domain.article.mapper.ArticleMapper">
+
+    <!-- 게시글 수 조회 -->
+    <select id="countArticles" resultType="int">
+        SELECT COUNT(*) FROM articles
+    </select>
+
+    <!-- 게시글 삽입 -->
+    <insert id="insertArticle" parameterType="com.example.domain.Article" useGeneratedKeys="true" keyProperty="articleId">
+        INSERT INTO articles (member_id, title, category, content, created_at, overview)
+        VALUES (#{memberId}, #{title}, #{category}, #{content}, #{createdAt}, #{overview})
+    </insert>
+
+    <!-- 게시글 목록 조회 -->
+    <select id="findArticles" resultType="com.example.domain.article.dto.ReadArticleDto">
+        SELECT
+        a.article_id AS articleId,
+        a.member_id AS memberId,
+        m.username AS username,   <!-- members 테이블에서 username 가져오기 -->
+        a.title,
+        a.category,
+        a.content,
+        a.created_at AS createdAt,
+        a.overview
+        FROM articles a
+        JOIN members m ON a.member_id = m.member_id
+        ORDER BY a.created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 게시글 목록 조회 -->
+    <select id="findArticle" resultType="com.example.domain.article.dto.ReadArticleDto">
+        SELECT
+        a.article_id AS articleId,
+        a.member_id AS memberId,
+        m.username AS username,   <!-- members 테이블에서 username 가져오기 -->
+        a.title,
+        a.category,
+        a.content,
+        a.created_at AS createdAt,
+        a.overview
+        FROM articles a
+        JOIN members m ON a.member_id = m.member_id
+        WHERE a.article_id = #{articleId}
+    </select>
+
+    <delete id="deleteArticle">
+        DELETE FROM articles
+        WHERE article_id = #{articleId}
+    </delete>
+
+</mapper>

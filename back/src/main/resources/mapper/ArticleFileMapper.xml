@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.domain.article.mapper.ArticleFileMapper">
+
+    <!-- 파일 삽입 -->
+    <insert id="insertFile" parameterType="com.example.domain.ArticleFile" useGeneratedKeys="true" keyProperty="fileId">
+        INSERT INTO article_files (article_id, file_name, file_path, content_type)
+        VALUES (#{articleId}, #{fileName}, #{filePath}, #{contentType})
+    </insert>
+
+    <select id="findArticleFiles" resultType="com.example.domain.ArticleFile">
+        SELECT
+            file_id AS fileId,
+            article_id AS articleId,
+            file_name AS fileName,
+            file_path AS filePath,
+            content_type AS contentType
+        FROM article_files
+        WHERE article_id = #{articleId}
+    </select>
+
+    <select id="findArticleFile" resultType="com.example.domain.ArticleFile">
+        SELECT
+            file_id AS fileId,
+            article_id AS articleId,
+            file_name AS fileName,
+            file_path AS filePath,
+            content_type AS contentType
+        FROM article_files
+        WHERE file_id = #{fileId}
+    </select>
+</mapper>
