@@ -53,6 +53,8 @@ const handleLogin = async () => {
     const response = await axios.post('http://localhost:8080/member/login', {
       email: email.value,
       password: password.value,
+    }, {
+      withCredentials: true, // 세션 쿠키를 포함하도록 설정
     });
 
     console.log('로그인 성공:', response.data);

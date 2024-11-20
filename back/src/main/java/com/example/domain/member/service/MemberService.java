@@ -24,4 +24,5 @@ public interface MemberService {
     void update(String username);
 
     void updatePassword(String password, String newPassword);
+
 }
