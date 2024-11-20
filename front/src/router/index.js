@@ -70,4 +70,33 @@ const router = createRouter({
   ],
 })
 
+import axios from 'axios';
+
+// 글로벌 네비게이션 가드
+router.beforeEach(async (to, from, next) => {
+  if (to.path.startsWith('/main')) {
+    // /main으로 시작하는 경로에 대해서만 세션 확인
+    try {
+      const response = await axios.get('http://localhost:8080/member/session', {
+        withCredentials: true, // 세션 쿠키 포함
+      });
+
+      console.log('세션 확인:', response.data); // 세션 정보 로그 출력 (��제)
+
+      // 로그인 상태 확인
+      if (response.data) {
+        next(); // 로그인 상태라면 그대로 진행
+      } else {
+        next({ name: 'login' }); // 비로그인 상태면 로그인 페이지로 이동
+      }
+    } catch (error) {
+      console.error('세션 확인 실패:', error.response?.data || error.message);
+      next({ name: 'login' }); // 에러 발생 시 로그인 페이지로 이동
+    }
+  } else {
+    // /main 외의 경로는 세션 확인 없이 통과
+    next();
+  }
+});
+
 export default router

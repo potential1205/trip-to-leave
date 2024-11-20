@@ -3,7 +3,7 @@
     <!-- Left: Logo -->
     <div class="logo ms-3">
       <span>
-        <router-link to="/" class="nav-link">
+        <router-link to="/main" class="nav-link">
           <img src="@/assets/images/image.png" style="width: 70px; height: 55px;">
         </router-link>
       </span>
@@ -18,7 +18,7 @@
 
     <!-- Right: User Profile -->
     <div class="user-profile me-3 d-flex align-items-center position-relative">
-      <span @click="toggleDropdown" class="user-name me-2">이재훈 님</span>
+      <span @click="toggleDropdown" class="user-name me-2">{{ userName }} 님</span>
       <span @click="toggleDropdown" class="profile-icon" style="cursor: pointer;">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-circle"
           viewBox="0 0 16 16">
@@ -107,9 +107,24 @@
 </style>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+
+const userName = ref(''); // 사용자 이름을 저장할 변수
+// onMounted에서 이름 가져오기
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:8080/member/name', {
+      withCredentials: true, // 세션 쿠키 포함
+    });
+    userName.value = response.data.name; // API 응답 데이터를 userName에 저장
+  } catch (error) {
+    console.error('사용자 이름 가져오기 실패:', error.response?.data || error.message);
+    alert('사용자 정보를 가져오는데 실패했습니다. 다시 시도하세요.');
+  }
+});
+
 const router = useRouter();
 
 const dropdownOpen = ref(false);
