@@ -96,17 +96,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void logout() {
-        Member member = (Member) session.getAttribute("member");
-
-        if (member == null) {
-            throw new DataBaseException("접근할 수 없습니다.");
-        }
-
-        session.invalidate();
-    }
-
-    @Override
     public void passwordResetEmailAuth(String email) {
         Member findMember = memberMapper.findByEmail(email);
 
