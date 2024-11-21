@@ -12,4 +12,6 @@ public interface ArticleFileMapper {
     List<ArticleFile> findArticleFiles(int articleId);
 
     ArticleFile findArticleFile(int fileId);
+
+    void deleteById(int articleId);
 }
