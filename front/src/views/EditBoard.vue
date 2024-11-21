@@ -39,8 +39,7 @@
                 <div v-for="(file, index) in existingFiles" :key="file.fileId || index"
                   class="file-item d-flex align-items-center justify-content-between mb-2 p-2">
                   <span>{{ file.fileName || file.name }}</span>
-                  <button type="button" class="btn btn-outline-danger btn-sm"
-                    @click="removeExistingFile(file.fileId || index)">
+                  <button type="button" class="btn btn-outline-danger btn-sm" @click="removeExistingFile(index)">
                     삭제
                   </button>
                 </div>
@@ -108,15 +107,12 @@ const addFile = () => {
 };
 
 // 기존 파일 삭제 처리
-const removeExistingFile = (fileId) => {
-  const index = existingFiles.value.findIndex((file) => file.fileId === fileId || file.file);
-  if (index !== -1) {
-    const file = existingFiles.value[index];
-    if (file.fileId) {
-      // 기존 파일이라면 삭제 리스트에 추가
-      deletedFiles.value.push(file.fileId);
-    }
-    existingFiles.value.splice(index, 1); // UI에서 제거
+const removeExistingFile = (index) => {
+  if (index >= 0 && index < existingFiles.value.length) {
+    existingFiles.value.splice(index, 1);
+    console.log(`파일 삭제됨: 인덱스 ${index}`);
+  } else {
+    console.warn(`파일 인덱스 ${index}를 찾을 수 없습니다.`);
   }
 };
 
@@ -221,6 +217,10 @@ const handleCancel = () => {
   border-radius: 5px;
   padding: 10px;
   background: #fff;
+  max-height: 180px;
+  /* 한 파일당 약 60px * 3 = 180px (3개의 파일을 보여줄 수 있도록 설정) */
+  overflow-y: auto;
+  /* 스크롤이 생기도록 설정 */
 }
 
 .file-item {
