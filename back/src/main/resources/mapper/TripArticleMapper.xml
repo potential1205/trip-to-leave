@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.domain.trip.mapper.TripArticleMapper">
+
+    <select id="getTripArticles" resultType="com.example.domain.trip.dto.TripArticleDto">
+        SELECT
+            t.trip_id AS tripId,
+            t.title,
+            t.start_at AS startAt,
+            t.end_at AS endAt,
+            t.cover_image AS coverImage,
+            t.likes,
+            t.overview,
+            m.username AS authorName
+        FROM trips t
+        JOIN members m ON t.member_id = m.member_id
+        ORDER BY t.created_at DESC ;
+    </select>
+
+</mapper>
