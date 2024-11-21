@@ -9,6 +9,7 @@ import com.example.domain.article.dto.ReadArticleResp;
 import com.example.domain.article.mapper.ArticleFileMapper;
 import com.example.domain.article.mapper.ArticleMapper;
 import com.example.domain.article.req.CreateArticleReq;
+import com.example.domain.article.req.UpdateArticleReq;
 import com.example.domain.article.resp.ReadArticlesResp;
 import com.example.domain.global.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -124,5 +125,78 @@ public class ArticleServiceImpl implements ArticleService {
     public void deleteArticle(int articleId) {
         articleMapper.deleteArticle(articleId);
     }
+
+    @Override
+    @Transactional
+    public void updateArticle(int articleId, UpdateArticleReq req, HttpServletRequest request) {
+        HttpSession session = request.getSession(false); // 세션 확인
+
+        if (session == null) {
+            throw new RuntimeException("접근할 수 없습니다.");
+        }
+
+        // 게시글 업데이트
+        Article updatedArticle = Article.builder()
+                .articleId(articleId)
+                .title(req.getTitle())
+                .category(req.getCategory())
+                .content(req.getContent())
+                .build();
+
+        articleMapper.updateArticle(updatedArticle);
+
+        String uploadDir = "C:/uploads/" + articleId + "/";
+        File uploadDirFile = new File(uploadDir);
+        if (uploadDirFile.exists()) {
+            deleteFolder(uploadDirFile); // 폴더 삭제
+        }
+        uploadDirFile.mkdirs(); // 폴더 재생성
+
+        articleFileMapper.deleteById(articleId);
+
+        // 새 파일 저장
+        if (req.getFiles() != null && !req.getFiles().isEmpty()) {
+            for (MultipartFile file : req.getFiles()) {
+                try {
+                    String filePath = uploadDir + file.getOriginalFilename();
+
+                    File savedFile = new File(filePath);
+
+                    file.transferTo(savedFile); // 파일 저장
+
+                    ArticleFile articleFile = ArticleFile.builder()
+                            .articleId(articleId)
+                            .fileName(file.getOriginalFilename())
+                            .filePath(filePath)
+                            .contentType(file.getContentType())
+                            .build();
+
+                    articleFileMapper.insertFile(articleFile); // 파일 정보 저장
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new BusinessException("파일 저장에 실패했습니다.");
+                }
+            }
+        }
+    }
+
+    private void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteFolder(file); // 재귀적으로 내부 폴더 삭제
+                } else {
+                    if (!file.delete()) {
+                        throw new BusinessException("파일 삭제 실패: " + file.getName());
+                    }
+                }
+            }
+        }
+        if (!folder.delete()) {
+            throw new BusinessException("폴더 삭제 실패: " + folder.getAbsolutePath());
+        }
+    }
+
 
 }

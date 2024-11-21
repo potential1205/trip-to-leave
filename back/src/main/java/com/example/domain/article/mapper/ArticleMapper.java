@@ -22,4 +22,6 @@ public interface ArticleMapper {
     ReadArticleDto findArticle(int articleId);
 
     void deleteArticle(int articleId);
+
+    void updateArticle(Article updatedArticle);
 }

@@ -33,7 +33,8 @@
 
           <!-- 목록으로 돌아가기 버튼 -->
           <div class="d-flex justify-content-start mt-3">
-            <router-link to="/main/board" class="btn btn-secondary">목록으로 돌아가기</router-link>
+            <router-link :to="`/main/board?page=${currentPage}`" class="btn btn-secondary">목록으로 돌아가기</router-link>
+
           </div>
         </div>
       </div>
@@ -51,7 +52,7 @@ import axios from 'axios';
 
 const route = useRoute();
 const router = useRouter();
-
+const currentPage = ref(Number(route.query.page) || 1);
 const post = ref(null); // 게시글 정보를 담을 변수
 const isAuthor = ref(false);
 
