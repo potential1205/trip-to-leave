@@ -29,4 +29,9 @@
         FROM article_files
         WHERE file_id = #{fileId}
     </select>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM article_files
+        WHERE article_id = #{articleId}
+    </delete>
 </mapper>

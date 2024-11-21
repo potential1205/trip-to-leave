@@ -51,4 +51,14 @@
         WHERE article_id = #{articleId}
     </delete>
 
+    <!-- 게시글 업데이트 -->
+    <update id="updateArticle">
+        UPDATE articles
+        SET
+            title = #{title},
+            category = #{category},
+            content = #{content}
+        WHERE article_id = #{articleId}
+    </update>
+
 </mapper>

@@ -7,6 +7,7 @@ import com.example.domain.article.mapper.ArticleFileMapper;
 import com.example.domain.article.req.CreateArticleReq;
 import com.example.domain.article.req.ReadArticleReq;
 import com.example.domain.article.req.ReadArticlesReq;
+import com.example.domain.article.req.UpdateArticleReq;
 import com.example.domain.article.resp.ReadArticlesResp;
 import com.example.domain.article.service.ArticleService;
 import com.example.domain.global.resp.SuccessResp;
@@ -54,6 +55,19 @@ public class ArticleController {
     public ResponseEntity<SuccessResp> deleteArticle(@PathVariable("articleId") int articleId) {
 
         articleService.deleteArticle(articleId);
+
+        return ResponseEntity.ok(
+                new SuccessResp(true)
+        );
+    }
+
+    @PatchMapping(value="/{articleId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<SuccessResp> updateArticle(
+            @PathVariable("articleId") int articleId,
+            @ModelAttribute UpdateArticleReq req,
+            HttpServletRequest request) {
+
+        articleService.updateArticle(articleId, req, request);
 
         return ResponseEntity.ok(
                 new SuccessResp(true)

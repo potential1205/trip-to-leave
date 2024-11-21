@@ -32,12 +32,34 @@
                 placeholder="내용을 입력하세요"></textarea>
             </div>
 
-            <!-- 파일 첨부 -->
-            <div class="mb-3">
-              <label for="file" class="form-label">파일 첨부</label>
-              <input type="file" id="file" class="form-control" @change="handleFileChange" />
+            <!-- 첨부된 파일 -->
+            <div class="mb-4">
+              <label class="form-label">첨부된 파일</label>
+              <div class="file-list">
+                <div v-for="(file, index) in existingFiles" :key="file.fileId || index"
+                  class="file-item d-flex align-items-center justify-content-between mb-2 p-2">
+                  <span>{{ file.fileName || file.name }}</span>
+                  <button type="button" class="btn btn-outline-danger btn-sm"
+                    @click="removeExistingFile(file.fileId || index)">
+                    삭제
+                  </button>
+                </div>
+              </div>
             </div>
 
+            <!-- 새 파일 추가 -->
+            <div class="mb-3">
+              <label for="newFiles" class="form-label">새 파일 추가</label>
+              <div class="d-flex align-items-center gap-2">
+                <input type="file" id="newFiles" class="form-control w-75" @change="handleFileChange"
+                  :disabled="isAddingFile" />
+                <button type="button" class="btn btn-outline-primary" @click="addFile" :disabled="!selectedFile">
+                  추가
+                </button>
+              </div>
+            </div>
+
+            <!-- 버튼 -->
             <div class="d-flex justify-content-end">
               <button type="submit" class="btn btn-primary me-2">수정</button>
               <button type="button" class="btn btn-secondary" @click="handleCancel">취소</button>
@@ -59,15 +81,46 @@ import axios from 'axios';
 const route = useRoute();
 const router = useRouter();
 
-const formData = ref(null); // 게시글 정보를 담을 변수
-const file = ref(null); // 첨부 파일
+const formData = ref(null); // 게시글 데이터
+const existingFiles = ref([]); // 기존 첨부 파일 목록
+const deletedFiles = ref([]); // 삭제 요청된 파일 ID 목록
+const selectedFile = ref(null); // 선택된 파일
+const isAddingFile = ref(false); // 파일 추가 상태
 
-// 파일 변경 시 처리
+// 파일 선택 처리
 const handleFileChange = (event) => {
-  file.value = event.target.files[0];
+  selectedFile.value = event.target.files[0];
 };
 
-// 수정 페이지에 데이터 가져오기
+// 새 파일 추가
+const addFile = () => {
+  if (selectedFile.value) {
+    const newFile = {
+      name: selectedFile.value.name,
+      file: selectedFile.value, // 실제 파일 데이터 저장
+    };
+
+    existingFiles.value.push(newFile); // 첨부된 파일 리스트에 추가
+    selectedFile.value = null; // 선택 초기화
+    isAddingFile.value = false;
+    document.getElementById("newFiles").value = ""; // input 초기화
+  }
+};
+
+// 기존 파일 삭제 처리
+const removeExistingFile = (fileId) => {
+  const index = existingFiles.value.findIndex((file) => file.fileId === fileId || file.file);
+  if (index !== -1) {
+    const file = existingFiles.value[index];
+    if (file.fileId) {
+      // 기존 파일이라면 삭제 리스트에 추가
+      deletedFiles.value.push(file.fileId);
+    }
+    existingFiles.value.splice(index, 1); // UI에서 제거
+  }
+};
+
+// 데이터 가져오기
 const fetchPost = async (postId) => {
   try {
     const response = await axios.get(`http://localhost:8080/articles/${postId}`, {
@@ -79,13 +132,19 @@ const fetchPost = async (postId) => {
       category: response.data.category,
       content: response.data.content,
     };
+
+    existingFiles.value = response.data.files.map((file) => ({
+      fileId: file.fileId,
+      fileName: file.fileName,
+    }));
   } catch (error) {
     console.error('게시글 불러오기 실패:', error);
     alert('게시글을 불러오는 데 실패했습니다.');
-    router.push('/main/board'); // 실패 시 게시판으로 리다이렉트
+    router.push('/main/board'); // 실패 시 게시판으로 이동
   }
 };
 
+// 게시글 수정 처리
 // 게시글 수정 처리
 const handleSubmit = async () => {
   if (!formData.value.title || !formData.value.category || !formData.value.content) {
@@ -99,25 +158,35 @@ const handleSubmit = async () => {
   updatedData.append('title', formData.value.title);
   updatedData.append('category', formData.value.category);
   updatedData.append('content', formData.value.content);
-  if (file.value) {
-    updatedData.append('file', file.value);
-  }
+
+  // 모든 첨부 파일 추가 (기존 파일 + 새로 추가된 파일)
+  existingFiles.value.forEach((file) => {
+    if (file.file) {
+      // 새로 추가된 파일 (실제 파일 데이터가 포함된 경우)
+      updatedData.append('files', file.file);
+    } else {
+      // 기존 파일 (fileId를 식별자로 보냄)
+      updatedData.append('files', new File([""], file.fileName)); // 파일 ID 대신 더미 파일 생성
+    }
+  });
 
   try {
-    const response = await axios.put(`http://localhost:8080/articles/${postId}`, updatedData, {
+    // API 호출 (PATCH 요청)
+    const response = await axios.patch(`http://localhost:8080/articles/${postId}`, updatedData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       withCredentials: true,
     });
 
     if (response.status === 200) {
       alert('게시글이 성공적으로 수정되었습니다.');
-      router.push('/main/board');
+      router.push(`/main/board/${postId}`);
     }
   } catch (error) {
     console.error('게시글 수정 실패:', error);
     alert('게시글 수정 중 문제가 발생했습니다.');
   }
 };
+
 
 // 컴포넌트가 마운트될 때 데이터 조회
 onMounted(() => {
@@ -145,5 +214,18 @@ const handleCancel = () => {
 .post-edit-section {
   background-color: #f9f9f9;
   border-radius: 5px;
+}
+
+.file-list {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  background: #fff;
+}
+
+.file-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background: #f8f9fa;
 }
 </style>

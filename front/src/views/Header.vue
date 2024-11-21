@@ -13,7 +13,7 @@
     <nav class="nav-menu d-flex">
       <router-link to="/main" class="nav-link" active-class="active-link" exact>여행지 검색</router-link>
       <router-link to="/main/album" class="nav-link" active-class="active-link" exact>여행첩</router-link>
-      <router-link to="/main/board" class="nav-link" active-class="active-link" exact>게시판</router-link>
+      <router-link to="/main/board?page=1" class="nav-link" active-class="active-link" exact>게시판</router-link>
     </nav>
 
     <!-- Right: User Profile -->
