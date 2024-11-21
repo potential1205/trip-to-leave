@@ -79,4 +79,10 @@
         WHERE content_id = #{id}
     </select>
 
+    <!-- 특정 키워드에 해당하는 관광명소 조회 -->
+    <select id="getAreaAttractionsByKeyword" resultMap="AttractionResultMap">
+        SELECT *
+        FROM attractions
+        WHERE title LIKE CONCAT('%', #{keyword}, '%')
+    </select>
 </mapper>
