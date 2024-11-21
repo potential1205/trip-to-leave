@@ -11,6 +11,7 @@
       <p><strong>전화번호:</strong> {{ selectedAttraction.tel || '정보 없음' }}</p>
       <p><strong>설명:</strong> {{ selectedAttraction.overview || '정보 없음' }}</p>
       <img v-if="selectedAttraction.firstImage1" :src="selectedAttraction.firstImage1" alt="이미지" class="image-preview" />
+      <img v-else src="../assets/images/이미지없음.png" class="image-notfound">
 
       <div ref="roadviewContainer" class="roadview-container"></div>
     </div>
@@ -317,4 +318,6 @@ onMounted(() => {
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+
 </style>

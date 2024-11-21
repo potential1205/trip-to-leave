@@ -168,4 +168,13 @@ onMounted(() => {
   height: auto;
   margin-top: 10px;
 }
+
+.image-notfound {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+}
 </style>
