@@ -15,7 +15,7 @@
         <!-- 군/구 선택 -->
         <div class="col-2">
           <select v-model="selectedSigungu" class="form-select" :disabled="!sigungus.length">
-            <option disabled value="">군/구</option>
+            <option value="default">군/구</option>
             <option v-for="sigungu in sigungus" :key="sigungu.gugunCode" :value="sigungu.gugunCode">
               {{ sigungu.gugunName }}
             </option>
@@ -25,7 +25,7 @@
         <!-- 컨텐츠 유형 선택 -->
         <div class="col-2">
           <select v-model="selectedContentType" class="form-select">
-            <option disabled value="">컨텐츠 유형</option>
+            <option value="default">컨텐츠 유형</option>
             <option v-for="type in contentTypes" :key="type.contentTypeId" :value="type.contentTypeId">
               {{ type.contentTypeName }}
             </option>
@@ -47,20 +47,6 @@
     <div class="map-and-panel">
       <!-- KakaoMap Component -->
       <KakaoMap :mapData="mapData" @markerClicked="handleMarkerClick" />
-
-      <!-- Detail Panel
-      <div v-if="selectedAttraction" class="detail-panel">
-        <h4>{{ selectedAttraction.title }}</h4>
-        <p><strong>주소:</strong> {{ selectedAttraction.addr1 }}</p>
-        <p><strong>전화:</strong> {{ selectedAttraction.tel }}</p>
-        <p><strong>소개:</strong> {{ selectedAttraction.overview }}</p>
-        <img v-if="selectedAttraction.first_image1" :src="selectedAttraction.first_image1" alt="이미지" class="image-preview" />
-      </div> -->
-      <DetailPanel
-      v-if="selectedAttraction"
-      :attraction="selectedAttraction"
-      @close="closePanel"
-    />
     </div>
   </div>
 </template>
@@ -69,7 +55,6 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import KakaoMap from './KakaoMap.vue';
-import sigunguLocations from '@/assets/sigunguLocations.json'; // JSON 파일 임포트
 
 const sidos = ref([]);
 const sigungus = ref([]);
@@ -121,8 +106,8 @@ const handleSidoChange = () => {
 const handleSearch = async () => {
   const params = {
     areacode: selectedSido.value,
-    sigungucode: selectedSigungu.value || null,
-    contenttypeid: selectedContentType.value || null,
+    sigungucode: selectedSigungu.value !== 'default'? selectedSigungu.value : null,
+    contenttypeid: selectedContentType.value !== 'default' ? selectedContentType.value : null,
     keyword: searchKeyword.value || null,
   };
 
@@ -137,13 +122,6 @@ const handleSearch = async () => {
     }));
 
     const selectedDistrictName = sigungus.value.find(sigungu => sigungu.gugunCode === selectedSigungu.value)?.gugunName;
-    const selectedDistrict = sigunguLocations[selectedDistrictName];
-
-    if (selectedDistrict) {
-      mapData.value.center = { lat: selectedDistrict.lat, lng: selectedDistrict.lng };
-    } else {
-      console.error('선택된 구의 좌표를 찾을 수 없습니다:', selectedDistrictName);
-    }
 
     mapData.value.markers = markers; // 마커 데이터 설정
   } catch (error) {
@@ -176,10 +154,6 @@ onMounted(() => {
 .body-container {
   margin: 0;
   padding: 0;
-}
-
-.map-and-panel {
-  display: flex;
 }
 
 .detail-panel {

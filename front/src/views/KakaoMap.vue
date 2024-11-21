@@ -79,20 +79,20 @@ const handleMarkerClick = async (marker) => {
       const roadviewClient = new window.kakao.maps.RoadviewClient();
       console.log("마커의 위치:", marker.position);
       console.log("LatLng 객체 여부:", marker.position instanceof window.kakao.maps.LatLng);
+      
       const position = new window.kakao.maps.LatLng(marker.position.Ma, marker.position.La);
       console.log("로드뷰 요청 좌표:", position);
 
       roadviewClient.getNearestPanoId(
-        
-        marker.position, // 정확한 LatLng 객체 전달
+        position, // 정확한 LatLng 객체 전달
         50, // 반경 50미터 내
         (panoId) => {
           if (panoId) {
             console.log("로드뷰 panoId:", panoId);
-            roadviewInstance.setPanoId(panoId, marker.position);
+            roadviewInstance.setPanoId(panoId, position);
           } else {
             console.error("로드뷰 데이터를 찾을 수 없습니다.");
-            alert("로드뷰 데이터를 찾을 수 없습니다.");
+            displayNoRoadviewMessage(); // 로드뷰가 없을 때 메시지 표시
           }
         }
       );
@@ -100,6 +100,7 @@ const handleMarkerClick = async (marker) => {
   } catch (error) {
     console.error("서버 요청 실패:", error);
     selectedAttraction.value = { title: marker.title, addr1: "데이터 없음", tel: "정보 없음" };
+    displayNoRoadviewMessage(); // 요청 실패 시에도 메시지 표시
   }
 };
 // 마커 모두 제거
@@ -145,7 +146,7 @@ const setBoundsOrCenter = () => {
   markers.forEach(marker => bounds.extend(marker.getPosition()));
 
   // 중심에서 멀리 떨어진 마커가 있는지 확인
-  const maxDistance = 1.0; // 허용할 최대 거리 차이
+  const maxDistance = 10.0; // 허용할 최대 거리 차이
   const centerLat = props.mapData.center.lat;
   const centerLng = props.mapData.center.lng;
   let isFar = false;
@@ -192,6 +193,16 @@ const initRoadview = async () => {
     }
   } else {
     console.error("로드뷰 컨테이너를 찾을 수 없습니다.");
+  }
+};
+
+const displayNoRoadviewMessage = () => {
+  if (roadviewContainer.value) {
+    roadviewContainer.value.innerHTML = `
+      <div style="display: flex; justify-content: center; align-items: center; height: 100%; font-size: 16px; color: #555;">
+        로드뷰가 없습니다.
+      </div>
+    `;
   }
 };
 
