@@ -52,32 +52,41 @@
 
 
       <!-- 카드 리스트 -->
-      <div v-if="trips.length > 0" v-for="trip in trips" :key="trip.trip_id" class="card-wrapper">
-        <div class="card">
-          <div class="card-image">
-            <img :src="trip.coverImage" alt="여행지 이미지" class="w-100 h-100" />
-          </div>
-          <div class="card-details d-flex flex-column p-3">
-            <h5 class="text-center fw-bold text-truncate" style="font-size: 1.3rem;">
-              {{ trip.title }}
-            </h5>
-            <p class="text-center text-muted" style="font-size: 0.9rem;">
-              {{ formatDates(trip.startAt, trip.endAt) }}
-            </p>
-            <p class="text-start text-muted" style="font-size: 0.8rem;">
-              {{ trip.hashtags || "#태그없음" }}
-            </p>
-            <div class="d-flex justify-content-between align-items-center mt-auto">
-              <div>
-                <button class="btn btn-sm btn-light ms-2" @click="addLike(trip.tripId)">
-                  ❤ {{ trip.likes }}
-                </button>
-              </div>
-              <small class="text-muted">조회수: {{ trip.overview || 0 }}</small>
-            </div>
-          </div>
+      <div v-if="trips.length > 0" v-for="trip in trips" :key="trip.tripId" class="card-wrapper">
+  <div class="card">
+    <!-- 이미지 -->
+    <div class="card-image">
+      <img 
+  :src="trip.files?.[0]?.filePath || 'http://localhost:8080/default/image/path.png'" 
+  alt="여행지 이미지" 
+  class="w-100 h-100" 
+  @error="onImageError"
+/>
+    </div>
+
+    <!-- 카드 상세 -->
+    <div class="card-details d-flex flex-column p-3">
+      <h5 class="text-center fw-bold text-truncate" style="font-size: 1.3rem;">
+        {{ trip.title }}
+      </h5>
+      <p class="text-center text-muted" style="font-size: 0.9rem;">
+        {{ formatDates(trip.startAt, trip.endAt) }}
+      </p>
+      <p class="text-start text-muted" style="font-size: 0.8rem;">
+        {{ trip.hashtags && trip.hashtags.length > 0 ? trip.hashtags.join(', ') : '#태그없음' }}
+      </p>
+      <div class="d-flex justify-content-between align-items-center mt-auto">
+        <div>
+          <button class="btn btn-sm btn-light ms-2" @click="addLike(trip.tripId)">
+            ❤ {{ trip.likes }}
+          </button>
         </div>
+        <small class="text-muted">조회수: {{ trip.overview || 0 }}</small>
       </div>
+    </div>
+  </div>
+</div>
+
 
       <!-- 데이터 없음 -->
       <div v-else class="no-data-message">
@@ -91,7 +100,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 
-const API_BASE_URL = "/trips/articles";
+const API_BASE_URL = "http://70.12.50.226:8080/trips/articles";
 const trips = ref([]); // 카드 목록
 const searchQuery = ref(""); // 검색 키워드
 const searchType = ref("keyword"); // 검색 유형
@@ -110,16 +119,20 @@ const fetchTrips = async () => {
   }
 };
 
-// 여행첩 검색
+//검색
 const searchTrips = async () => {
-  if (!searchType.value || !searchQuery.value) {
-    console.error("검색 유형과 키워드를 입력하세요.");
-    return;
-  }
   try {
-    const response = await axios.get(`${API_BASE_URL}/search`, {
-      params: { type: searchType.value, query: searchQuery.value },
-    });
+    let response;
+    if (searchType.value === "hashtag") {
+      console.log("Search by hashtag:", searchQuery.value);
+      response = await axios.get(`${API_BASE_URL}/search-by-hashtag`, {
+        params: { hashtag: searchQuery.value },
+      });
+    } else {
+      response = await axios.get(`${API_BASE_URL}/search-by-keyword`, {
+        params: { keyword: searchQuery.value },
+      });
+    }
     trips.value = response.data;
   } catch (error) {
     console.error("Error searching trips:", error);
@@ -170,7 +183,7 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100vh; /* 화면 전체를 차지하도록 설정 */
+  height: 100vh; 
   display: flex;
   flex-direction: column;
 }
@@ -183,7 +196,7 @@ html, body {
   justify-content: center; /* 카드들이 왼쪽부터 오른쪽으로 쌓이도록 설정 */
   align-items: flex-start; /* 카드들이 세로로도 일정하게 정렬되도록 설정 */
   padding: 3rem;
-  overflow-y:  scroll; /* 세로 스크롤 활성화 */
+  overflow-y:  auto; /* 세로 스크롤 활성화 */
   margin: auto; /* 양쪽 여백을 동일하게 하여 중앙 배치 */
 }
 
@@ -197,7 +210,7 @@ html, body {
   border-radius: 8px;
   overflow: hidden;
   background-color: #fff;
-  height: 35vh;
+  height: 40vh;
   display: flex;
   transition: transform 0.2s;
   width: 30vh;
@@ -219,28 +232,32 @@ html, body {
 }
 
 .card-details {
-  padding: 0.5rem 0.5rem 0.3rem;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  padding: 0.5rem 0.5rem 0.3rem; /* 기존 여백 유지 */
+  flex-grow: 1; /* 남은 공간을 상세 내용이 차지하도록 */
+  display: flex; /* 플렉스 레이아웃 유지 */
+  flex-direction: column; /* 상세 내용이 세로로 정렬되도록 설정 */
+  justify-content: space-between; /* 내용을 위쪽과 아래쪽으로 간격을 둠 */
+  overflow-y: auto; /* 상세 내용이 넘칠 경우 스크롤 활성화 */
 }
 
 .card-details h5 {
-  margin: 0.3rem 0;
+  margin: 0.3rem 0; /* 제목 간격 설정 */
+  flex-shrink: 0; /* 제목 영역이 줄어들지 않도록 설정 */
 }
 
 .card-details p {
-  margin: 0.2rem 0;
+  margin: 0.2rem 0; /* 본문 간격 설정 */
+  flex-shrink: 0; /* 본문 영역이 줄어들지 않도록 설정 */
 }
 
 .card-details .d-flex {
-  margin-top: auto;
+  margin-top: auto; /* 좋아요와 조회수가 항상 하단에 위치하도록 설정 */
 }
+
 
 .add-card {
   background-color: #e9e9e9;
-  height: 35vh;
+  height: 40vh;
   display: flex;
   align-items: center;
   justify-content: center;
