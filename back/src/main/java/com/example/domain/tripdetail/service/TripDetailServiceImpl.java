@@ -1,14 +1,15 @@
 package com.example.domain.tripdetail.service;
 
-import com.example.domain.ArticleFile;
-import com.example.domain.Member;
-import com.example.domain.Trip;
-import com.example.domain.TripFile;
+import com.example.domain.*;
 import com.example.domain.global.BusinessException;
-import com.example.domain.member.mapper.MemberMapper;
+import com.example.domain.tripdetail.dto.LocationDto;
+import com.example.domain.tripdetail.mapper.TripAttractionMapper;
 import com.example.domain.tripdetail.mapper.TripDetailMapper;
 import com.example.domain.tripdetail.mapper.TripFileMapper;
 import com.example.domain.tripdetail.req.CreateTripReq;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class TripDetailServiceImpl implements TripDetailService {
 
     private final TripDetailMapper tripDetailMapper;
     private final TripFileMapper tripFileMapper;
+    private final TripAttractionMapper tripAttractionMapper;
 
     @Override
     @Transactional
@@ -98,5 +100,57 @@ public class TripDetailServiceImpl implements TripDetailService {
             }
         }
 
+
+        if (req.getLocations() != null) {
+            for (List<Object> data : req.getLocations()) {
+                if (!data.isEmpty()) {
+                    if (data.get(0) instanceof String) {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        try {
+                            LocationDto attraction = objectMapper.readValue((String) data.get(0), LocationDto.class);
+
+                            TripAttraction tripAttraction = TripAttraction.builder()
+                                    .tripId(tripId)
+                                    .attractionId(attraction.getAttractionId())
+                                    .build();
+
+                            System.out.println(tripAttraction);
+
+                            tripAttractionMapper.insertTripAttraction(tripAttraction);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new BusinessException("여행첩 관광지 정보를 등록하는데 실패했습니다.");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (req.getImages() != null && !req.getImages().isEmpty()) {
+            for (MultipartFile file : req.getImages()) {
+                try{
+                    String filePath = uploadDir + file.getOriginalFilename();
+
+                    File savedFile = new File(filePath);
+
+                    file.transferTo(savedFile);
+
+                    TripFile tripFile = TripFile.builder()
+                            .tripId(tripId)
+                            .fileName(file.getOriginalFilename())
+                            .filePath(filePath)
+                            .contentType(file.getContentType())
+                            .fileType("NORMAL")
+                            .build();
+
+                    tripFileMapper.insertTripFile(tripFile);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new BusinessException("컨텐츠 이미지 저장에 실패했습니다.");
+                }
+            }
+        }
     }
 }

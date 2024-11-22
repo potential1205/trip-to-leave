@@ -3,6 +3,7 @@ package com.example.domain.Attraction.controller;
 
 import com.example.domain.Attraction.dto.AttractionDto;
 import com.example.domain.Attraction.service.AttractionService;
+import com.example.domain.Attraction.vo.Attraction;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -66,7 +66,7 @@ public class MemberController {
         HttpSession session = request.getSession(true);
 
         session.setAttribute("member", member);
-        session.setMaxInactiveInterval(300);
+        session.setMaxInactiveInterval(3600);
 
         return ResponseEntity.ok(
                 new SuccessResp(true)

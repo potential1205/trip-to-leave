@@ -95,9 +95,19 @@
                         </div>
 
                         <!-- 대표 이미지 입력 -->
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="post-image" class="form-label">대표 이미지</label>
                             <input id="post-image" type="file" @change="handleImageUpload" class="form-control" />
+                        </div> -->
+                        <div class="mb-3">
+                            <label for="post-image" class="form-label">대표 이미지</label>
+                            <!-- 파일 입력 -->
+                            <input id="post-image" type="file" @change="handleImageUpload" class="form-control" />
+
+                            <!-- 미리보기 이미지 -->
+                            <div v-if="postImage" class="mt-3 text-center">
+                                <img :src="postImage" alt="대표 이미지" class="img-fluid rounded" style="width: 20%;" />
+                            </div>
                         </div>
                         <!-- 해시태그 입력 -->
                         <div class="mb-3">
@@ -157,8 +167,10 @@
 <script setup>
 import { ref, computed, watchEffect } from 'vue';
 import { marked } from 'marked';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 
+const router = useRouter();
 const postImageFile = ref(null);
 
 const createTrip = async () => {
@@ -171,13 +183,16 @@ const createTrip = async () => {
         alert("대표 이미지를 선택하세요.");
         return;
     }
+    if (!startDate.value || !endDate.value) {
+        alert("기간을 입력하세요.");
+        return;
+    }
 
     // FormData 객체 생성
     const formData = new FormData();
     formData.append("title", postTitle.value.trim());
-    formData.append("content", markdown.value.trim());
 
-    console.log(startDate.value);
+    formData.append("content", markdown.value.trim());
 
     formData.append("startAt", startDate.value);
     formData.append("endAt", endDate.value);
@@ -198,6 +213,10 @@ const createTrip = async () => {
         });
     });
 
+    // 마크다운 이미지 파일
+    droppedImages.value.forEach((file, index) => {
+        formData.append(`images[${index}]`, file); // 파일 데이터를 images 배열로 전송
+    });
 
     try {
         const response = await axios.post("http://localhost:8080/tripdetail", formData, {
@@ -207,6 +226,7 @@ const createTrip = async () => {
         });
         alert("여행 계획이 성공적으로 생성되었습니다!");
         console.log(response.data);
+        router.push("/main/album");
     } catch (error) {
         console.error("여행 계획 생성 중 오류 발생:", error);
         alert("여행 계획 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -258,6 +278,8 @@ const removeHashtag = (index) => {
     hashtags.value.splice(index, 1); // 해당 인덱스 해시태그 제거
 };
 
+const droppedImages = ref([]); // 드래그된 파일 저장
+
 const handleDrop = async (event) => {
     const file = event.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
@@ -266,6 +288,7 @@ const handleDrop = async (event) => {
 
         // 업로드된 이미지 URL을 Markdown 에디터에 삽입
         markdown.value += `![이미지 설명](${tempUrl})\n`;
+        droppedImages.value.push(file);
     }
 };
 

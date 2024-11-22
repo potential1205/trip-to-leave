@@ -9,8 +9,8 @@ import lombok.*;
 @EqualsAndHashCode
 public class AttractionDto { // Attraction 전체 Dto
 
-    private int attractionId;
-    private int contentId;
+    private Integer attractionId;
+    private Integer contentId;
     private String title;
     private int contentTypeId;
     private int areaCode;
