@@ -9,9 +9,7 @@ import lombok.*;
 @EqualsAndHashCode
 public class AttractionDto { // Attraction 전체 Dto
 
-    @Setter(value = AccessLevel.NONE)
-    private int no;
-
+    private int attractionId;
     private int contentId;
     private String title;
     private int contentTypeId;

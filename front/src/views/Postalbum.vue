@@ -181,8 +181,23 @@ const createTrip = async () => {
 
     formData.append("startAt", startDate.value);
     formData.append("endAt", endDate.value);
-    hashtags.value.forEach((hashtag) => formData.append("hashTags", hashtag)); // 해시태그 추가
-    formData.append("coverImage", postImageFile.value); // 업로드된 파일 객체
+
+    // 해시태그 추가
+    hashtags.value.forEach((hashtag) => formData.append("hashTags", hashtag));
+
+    // 업로드된 파일 객체
+    formData.append("coverImage", postImageFile.value);
+
+    // 헤딩 정보
+    formData.append("headings", JSON.stringify(headings.value));
+
+    // 장소 정보 추가
+    headings.value.forEach((heading, headingIndex) => {
+        heading.locations.forEach((location, locationIndex) => {
+            formData.append(`locations[${headingIndex}][${locationIndex}]`, JSON.stringify(location));
+        });
+    });
+
 
     try {
         const response = await axios.post("http://localhost:8080/tripdetail", formData, {
@@ -222,6 +237,8 @@ const searchLocations = async () => {
         if (response.data.length === 0) {
             alert("검색 결과가 없습니다.");
         }
+
+        console.log(response.data);
     } catch (error) {
         console.error("장소 검색 중 오류 발생:", error);
         alert("장소 검색 중 오류가 발생했습니다. 다시 시도해주세요.");

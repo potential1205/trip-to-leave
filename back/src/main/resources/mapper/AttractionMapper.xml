@@ -6,7 +6,7 @@
 <mapper namespace="com.example.domain.Attraction.mapper.AttractionMapper">
 
     <resultMap id="AttractionResultMap" type="com.example.domain.Attraction.vo.Attraction">
-        <id property="no" column="no"/>
+        <id property="attractionId" column="attraction_id"/>
         <result property="contentId" column="content_id"/>
         <result property="title" column="title"/>
         <result property="contentTypeId" column="content_type_id"/>

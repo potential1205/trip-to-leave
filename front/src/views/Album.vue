@@ -52,7 +52,7 @@
 
                             <!-- Card 1 -->
                             <div class="col-3 mb-5">
-                                <router-link :to="{ name: 'albumDetail', params: { id: 1 }}" class="card-link">
+                                <router-link :to="{ name: 'albumDetail', params: { id: 1 } }" class="card-link">
                                     <div class="card">
                                         <div class="card-image">
                                             <img src="@/assets/images/default.jpg" alt="여행지 이미지" class="w-100 h-100" />

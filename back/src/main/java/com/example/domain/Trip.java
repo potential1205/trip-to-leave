@@ -24,4 +24,5 @@ public class Trip {
     private String startAt; // Start date and time of the trip
     private String endAt; // End date and time of the trip
     private MultipartFile coverImage; // URL or path to the cover image
+    private String headings;
 }

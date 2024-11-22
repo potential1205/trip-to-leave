@@ -19,4 +19,8 @@ public class CreateTripReq {
     private LocalDate endAt;
     private MultipartFile coverImage;
     private List<String> hashTags;
+
+    private List<List<Object>> locations; // 장소 정보들
+    private String headings;
+    private List<MultipartFile> images;
 }

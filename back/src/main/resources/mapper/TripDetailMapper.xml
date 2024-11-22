@@ -13,7 +13,8 @@
             likes,
             overview,
             start_at,
-            end_at
+            end_at,
+            headings
         )
         VALUES (
                    #{memberId},
@@ -24,7 +25,8 @@
                    #{likes},
                    #{overview},
                    #{startAt},
-                   #{endAt}
+                   #{endAt},
+                   #{headings}
                )
     </insert>
 
