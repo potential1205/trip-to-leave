@@ -1,5 +1,6 @@
 package com.example.domain.trip.service;
 
+import com.example.domain.global.BusinessException;
 import com.example.domain.trip.dto.TripArticleDto;
 import com.example.domain.trip.dto.TripFileDto;
 import com.example.domain.trip.mapper.TripArticleMapper;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,13 +20,28 @@ public class TripArticleServiceImpl implements TripArticleService {
     private final TripArticleMapper tripArticleMapper;
     private static final Logger logger = LoggerFactory.getLogger(TripArticleServiceImpl.class);
 
+<<<<<<< Updated upstream
     // 파일 경로 변환 함수
     private String convertPath(String filePath) {
         if (filePath.startsWith("C:/")) {
             return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
         }
         return filePath;
+=======
+//    // 파일 경로 변환 함수
+//    private String convertPath(String filePath) {
+//        if (filePath.startsWith("C:/")) {
+//            return filePath.replace("C:/uploads", "http://70.12.50.226:8080/uploads");
+//        }
+//        return filePath;
+//    }
+private String convertPath(String filePath) {
+    if (filePath.startsWith("C:/")) {
+        return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
+>>>>>>> Stashed changes
     }
+    return filePath;
+}
 
     @Override
     public List<TripArticleDto> getAllTripArticles() {
@@ -123,6 +140,21 @@ public class TripArticleServiceImpl implements TripArticleService {
     }
 
     @Override
+    public void addLikeToTripArticle(int tripId, int memberId) {
+        // 좋아요 중복 여부 확인
+        Integer likeCount = tripArticleMapper.findLike(tripId, memberId);
+        if (likeCount != null && likeCount > 0) {
+            throw new BusinessException("이미 좋아요를 누른 게시글입니다.");
+        }
+
+        // 좋아요 추가
+        tripArticleMapper.insertLike(tripId, memberId);
+
+        // 좋아요 수 증가
+        tripArticleMapper.incrementLikes(tripId);
+    }
+
+    @Override
     public void incrementViewCount(int id) {
         int rowsAffected = tripArticleMapper.incrementViewCount(id);
 
@@ -132,5 +164,20 @@ public class TripArticleServiceImpl implements TripArticleService {
         }
 
         logger.info("Incremented view count for trip article with ID: {}", id);
+    }
+
+    @Override
+    public List<TripArticleDto> getArticlesByMemberId(int memberId) {
+        List<TripArticleDto> articles = tripArticleMapper.getArticlesByMemberId(memberId);
+
+        for (TripArticleDto article : articles) {
+            if (article.getFiles() != null && !article.getFiles().isEmpty()) {
+                for (TripFileDto file : article.getFiles()) {
+                    file.setFilePath(convertPath(file.getFilePath()));
+                }
+            }
+        }
+
+        return articles;
     }
 }

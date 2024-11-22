@@ -17,7 +17,16 @@ public interface TripArticleMapper {
 
     List<TripArticleDto> searchArticlesByHashtag(@Param("hashtag") String hashtag);
 
-    int incrementLikes(@Param("id") int id);
+    // 좋아요 중복 여부 확인
+    Integer findLike(@Param("tripId") int tripId, @Param("memberId") int memberId);
+
+    // 좋아요 추가
+    void insertLike(@Param("tripId") int tripId, @Param("memberId") int memberId);
+
+    // 좋아요 수 증가
+    int incrementLikes(@Param("tripId") int tripId);
 
     int incrementViewCount(@Param("id") int id);
+
+    List<TripArticleDto> getArticlesByMemberId(@Param("memberId") int memberId);
 }

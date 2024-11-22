@@ -50,7 +50,7 @@
         LEFT JOIN trip_hashtags th ON t.trip_id = th.trip_id
         LEFT JOIN hashtags h ON th.hashtag_id = h.hashtag_id
         ORDER BY
-        t.created_at DESC
+            t.likes DESC, t.created_at DESC
     </select>
 
     <select id="searchArticlesByHashtag" resultMap="TripArticleResultMap">
@@ -75,7 +75,8 @@
                 LEFT JOIN trip_hashtags th ON t.trip_id = th.trip_id
                 LEFT JOIN hashtags h ON th.hashtag_id = h.hashtag_id
         WHERE h.hashtag_content = #{hashtag}
-        ORDER BY t.created_at DESC
+        ORDER BY
+            t.likes DESC, t.created_at DESC
     </select>
 
     <!-- 키워드 검색 쿼리 -->
@@ -103,7 +104,51 @@
         WHERE
             t.title LIKE CONCAT('%', #{keyword}, '%')
         ORDER BY
-            t.created_at DESC
+            t.likes DESC, t.created_at DESC
+    </select>
+
+    <!-- 좋아요 확인 -->
+    <select id="findLike" resultType="Integer">
+        SELECT COUNT(*)
+        FROM likes
+        WHERE trip_id = #{tripId} AND member_id = #{memberId}
+    </select>
+
+    <!-- 좋아요 추가 -->
+    <insert id="insertLike">
+        INSERT INTO likes (trip_id, member_id, created_at)
+        VALUES (#{tripId}, #{memberId}, NOW())
+    </insert>
+
+    <!-- 좋아요 수 증가 -->
+    <update id="incrementLikes">
+        UPDATE trips
+        SET likes = likes + 1
+        WHERE trip_id = #{tripId}
+    </update>
+
+    <select id="getArticlesByMemberId" resultMap="TripArticleResultMap">
+        SELECT
+            t.trip_id,
+            t.title,
+            t.start_at,
+            t.end_at,
+            t.likes,
+            t.overview,
+            m.username AS author_name,
+            f.file_id,
+            f.file_name,
+            f.file_path,
+            f.content_type,
+            f.file_type,
+            h.hashtag_content
+        FROM trips t
+                 JOIN members m ON t.member_id = m.member_id
+                 LEFT JOIN trip_files f ON t.trip_id = f.trip_id
+                 LEFT JOIN trip_hashtags th ON t.trip_id = th.trip_id
+                 LEFT JOIN hashtags h ON th.hashtag_id = h.hashtag_id
+        WHERE t.member_id = #{memberId}
+        ORDER BY t.created_at DESC
     </select>
 
 
