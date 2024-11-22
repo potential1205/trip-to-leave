@@ -20,14 +20,6 @@ public class TripArticleServiceImpl implements TripArticleService {
     private final TripArticleMapper tripArticleMapper;
     private static final Logger logger = LoggerFactory.getLogger(TripArticleServiceImpl.class);
 
-<<<<<<< Updated upstream
-    // 파일 경로 변환 함수
-    private String convertPath(String filePath) {
-        if (filePath.startsWith("C:/")) {
-            return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
-        }
-        return filePath;
-=======
 //    // 파일 경로 변환 함수
 //    private String convertPath(String filePath) {
 //        if (filePath.startsWith("C:/")) {
@@ -35,12 +27,11 @@ public class TripArticleServiceImpl implements TripArticleService {
 //        }
 //        return filePath;
 //    }
-private String convertPath(String filePath) {
-    if (filePath.startsWith("C:/")) {
-        return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
->>>>>>> Stashed changes
-    }
-    return filePath;
+    private String convertPath(String filePath) {
+        if (filePath.startsWith("C:/")) {
+            return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
+        }
+        return filePath;
 }
 
     @Override
