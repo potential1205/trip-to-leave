@@ -76,4 +76,12 @@ public class AttractionServiceImpl implements AttractionService {
         logger.info("Fetched Attraction from Mapper: {}", attraction);
         return dtoMapper.toDto(attraction);
     }
+
+    @Override
+    public List<AttractionDto> getAreaAttractionsByKeyword(String keyword) {
+
+        List<Attraction> attractionList = attractionMapper.getAreaAttractionsByKeyword(keyword);
+
+        return attractionList.stream().map(dtoMapper::toDto).toList();
+    }
 }

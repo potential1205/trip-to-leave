@@ -79,4 +79,12 @@ public class AttractionController {
 
         return ResponseEntity.ok(attraction);
     }
+
+    @GetMapping("/area")
+    public ResponseEntity<List<AttractionDto>> getAreaAttractions(@RequestParam String keyword) {
+
+        List<AttractionDto> attractions = attractionService.getAreaAttractionsByKeyword(keyword);
+
+        return ResponseEntity.ok(attractions);
+    }
 }

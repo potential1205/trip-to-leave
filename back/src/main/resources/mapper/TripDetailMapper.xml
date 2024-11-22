@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.domain.tripdetail.mapper.TripDetailMapper">
+
+    <!-- INSERT INTO trips -->
+    <insert id="save" parameterType="com.example.domain.Trip" useGeneratedKeys="true" keyProperty="tripId">
+        INSERT INTO trips (
+            member_id,
+            title,
+            content,
+            created_at,
+            updated_at,
+            likes,
+            overview,
+            start_at,
+            end_at,
+            headings
+        )
+        VALUES (
+                   #{memberId},
+                   #{title},
+                   #{content},
+                   NOW(),
+                   NOW(),
+                   #{likes},
+                   #{overview},
+                   #{startAt},
+                   #{endAt},
+                   #{headings}
+               )
+    </insert>
+
+    <insert id="insertTripHashtag">
+        INSERT INTO trip_hashtags (trip_id, hashtag_id)
+        VALUES (#{tripId}, #{hashtagId});
+    </insert>
+
+    <select id="findIdsByTags" resultType="int">
+        SELECT hashtag_id
+        FROM hashtags
+        WHERE hashtag_content IN
+        <foreach collection="hashTags" item="tag" open="(" separator="," close=")">
+            #{tag}
+        </foreach>
+    </select>
+</mapper>

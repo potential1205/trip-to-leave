@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         "com.example.domain.member.mapper",
         "com.example.domain.article.mapper",
         "com.example.domain.trip.mapper"
+        "com.example.domain.tripdetail.mapper",
 })
 @SpringBootApplication(scanBasePackages = {"com.example"})
 public class BackApplication {

@@ -50,6 +50,7 @@
         </router-link>
       </div>
 
+
       <!-- 카드 리스트 -->
       <div v-if="trips.length > 0" v-for="trip in trips" :key="trip.trip_id" class="card-wrapper">
         <div class="card">

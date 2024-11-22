@@ -14,7 +14,7 @@
                         <!-- 장소 목록 표시 -->
                         <ul>
                             <li v-for="location in item.locations" :key="location">
-                                <span>{{ location }}</span>
+                                <span>{{ location.title }}</span>
                                 <button class="btn btn-danger btn-sm ms-2"
                                     @click="removeLocation(index, locIndex)">삭제</button>
                             </li>
@@ -30,14 +30,16 @@
             <!-- Middle Section -->
             <div v-if="isLocationSearchVisible" class="col-2 d-flex flex-column p-3 border">
                 <h5>장소 검색</h5>
-                <!-- 장소 검색 입력 -->
-                <input type="text" v-model="searchQuery" class="form-control mb-3" placeholder="장소를 검색하세요"
-                    @input="searchLocations" />
+                <!-- 장소 검색 입력과 버튼 -->
+                <div class="input-group mb-3">
+                    <input type="text" v-model="searchQuery" class="form-control" placeholder="장소를 검색하세요" />
+                    <button class="btn btn-primary" @click="searchLocations">검색</button>
+                </div>
                 <!-- 장소 검색 결과 -->
-                <ul class="list-group">
-                    <li v-for="result in searchResults" :key="result" class="list-group-item"
+                <ul class="list-group overflow-y-scroll custom-scrollbar" style="max-height: 70vh;">
+                    <li v-for="result in searchResults" :key="result.no" class="list-group-item"
                         @click="selectLocation(result)" style="cursor: pointer;">
-                        {{ result }}
+                        {{ result.title }}
                     </li>
                 </ul>
 
@@ -50,6 +52,7 @@
                     </button>
                 </div>
             </div>
+
 
 
             <!-- Right Section -->
@@ -89,13 +92,6 @@
                                 <input id="post-end-date" type="date" v-model="endDate" class="form-control"
                                     placeholder="종료 날짜" />
                             </div>
-                        </div>
-
-                        <!-- 작성자 이름 입력 -->
-                        <div class="mb-3">
-                            <label for="post-author" class="form-label">작성자</label>
-                            <input id="post-author" type="text" v-model="authorName" class="form-control"
-                                placeholder="작성자 이름" />
                         </div>
 
                         <!-- 대표 이미지 입력 -->
@@ -147,6 +143,11 @@
                             style="max-height:70vh;  width: 90%;"></div>
                     </div>
                 </div>
+
+                <!-- 게시글 작성 완료 버튼 -->
+                <div class="text-center mt-4">
+                    <button class="btn btn-success" @click="createTrip">작성 완료</button>
+                </div>
             </div>
         </div>
     </div>
@@ -156,10 +157,93 @@
 <script setup>
 import { ref, computed, watchEffect } from 'vue';
 import { marked } from 'marked';
+import axios from 'axios';
+
+const postImageFile = ref(null);
+
+const createTrip = async () => {
+    // 기본 데이터 검증
+    if (!postTitle.value.trim()) {
+        alert("제목을 입력하세요.");
+        return;
+    }
+    if (!postImage.value) {
+        alert("대표 이미지를 선택하세요.");
+        return;
+    }
+
+    // FormData 객체 생성
+    const formData = new FormData();
+    formData.append("title", postTitle.value.trim());
+    formData.append("content", markdown.value.trim());
+
+    console.log(startDate.value);
+
+    formData.append("startAt", startDate.value);
+    formData.append("endAt", endDate.value);
+
+    // 해시태그 추가
+    hashtags.value.forEach((hashtag) => formData.append("hashTags", hashtag));
+
+    // 업로드된 파일 객체
+    formData.append("coverImage", postImageFile.value);
+
+    // 헤딩 정보
+    formData.append("headings", JSON.stringify(headings.value));
+
+    // 장소 정보 추가
+    headings.value.forEach((heading, headingIndex) => {
+        heading.locations.forEach((location, locationIndex) => {
+            formData.append(`locations[${headingIndex}][${locationIndex}]`, JSON.stringify(location));
+        });
+    });
+
+
+    try {
+        const response = await axios.post("http://localhost:8080/tripdetail", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }, withCredentials: true, // 세션 쿠키 포함
+        });
+        alert("여행 계획이 성공적으로 생성되었습니다!");
+        console.log(response.data);
+    } catch (error) {
+        console.error("여행 계획 생성 중 오류 발생:", error);
+        alert("여행 계획 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
+};
+
 
 // 해시태그 관련 상태
 const newHashtag = ref(''); // 새로 입력된 해시태그
 const hashtags = ref([]); // 해시태그 목록
+
+// 장소 검색 함수
+const searchLocations = async () => {
+    if (!searchQuery.value.trim()) {
+        alert("검색어를 입력하세요.");
+        return;
+    }
+
+    try {
+        // API 요청
+        const response = await axios.get("http://localhost:8080/attractions/area", {
+            params: { keyword: searchQuery.value.trim() },
+        });
+
+        // 검색 결과 업데이트
+        searchResults.value = response.data;
+
+        if (response.data.length === 0) {
+            alert("검색 결과가 없습니다.");
+        }
+
+        console.log(response.data);
+    } catch (error) {
+        console.error("장소 검색 중 오류 발생:", error);
+        alert("장소 검색 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
+};
 
 // 해시태그 추가
 const addHashtag = () => {
@@ -242,6 +326,7 @@ const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
         postImage.value = URL.createObjectURL(file);
+        postImageFile.value = file;
     }
 };
 
@@ -285,25 +370,7 @@ const openLocationSearch = (index) => {
 };
 
 // 장소 검색
-const searchLocations = () => {
-    // 더미 데이터 예시
-    const dummyData = [
-        "서울역",
-        "강남역",
-        "홍대입구역",
-        "건대입구역",
-        "잠실역",
-        "고속터미널역",
-        "을지로입구역",
-        "왕십리역",
-        "청량리역",
-        "용산역",
-    ];
-    // 검색어 필터링
-    searchResults.value = dummyData.filter((location) =>
-        location.includes(searchQuery.value)
-    );
-};
+
 
 // 장소 선택
 const selectLocation = (location) => {
@@ -330,10 +397,45 @@ const cancelLocationSelection = () => {
     closeLocationSearch();
 };
 
-
 </script>
 
 <style scoped>
+.custom-scrollbar {
+    max-height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    /* Firefox: 얇은 스크롤바 */
+    scrollbar-color: gray #f1f1f1;
+    /* Firefox: 스크롤바와 배경 색상 */
+}
+
+/* Chrome, Safari, Edge */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    /* 스크롤바 너비 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* 스크롤 트랙 색상 */
+    border-radius: 4px;
+    /* 모서리 둥글게 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #007bff;
+    /* 스크롤바 색상 */
+    border-radius: 4px;
+    /* 모서리 둥글게 */
+    border: 2px solid #f1f1f1;
+    /* 스크롤바와 트랙 사이 여백 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #0056b3;
+    /* 스크롤바 색상 (Hover) */
+}
+
 .markdown-editor {
     padding: 1rem;
     position: relative;
