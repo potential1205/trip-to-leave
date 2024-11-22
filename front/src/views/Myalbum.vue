@@ -1,208 +1,185 @@
 <template>
     <div class="body-container">
-        <div class="row h-100">
-            <!-- Left Section -->
-            <div class="col-2 d-flex flex-column p-0">
-
-            </div>
-
-            <!-- Right Section -->
-            <div class="col-8 d-flex flex-column m-0 p-0 border">
-                <!-- Top Section (1/6) -->
-                <div class="flex-item flex-top d-flex align-items-center justify-content-center">
-                    <div class="search-bar container-fluid py-3">
-                        <div class="row align-items-center">
-                            <!-- 시/도 선택 -->
-                            <div class="col-2">
-                                <h5 class="fw-bold">나의 여행첩</h5>
-                            </div>
-
-                            <!-- 검색 유형 선택 -->
-                            <div class="col-2">
-                                <select class="form-select" aria-label="검색 유형 선택">
-                                    <option selected>검색 유형</option>
-                                    <option value="hashtag">해시태그</option>
-                                    <option value="keyword">키워드</option>
-                                    <!-- Add more options as needed -->
-                                </select>
-                            </div>
-
-                            <!-- 검색 키워드 입력 -->
-                            <div class="col-4">
-                                <input type="text" class="form-control" placeholder="검색 키워드를 입력하세요" />
-                            </div>
-
-                            <!-- 검색 버튼 -->
-                            <div class="col-4">
-                                <button class="btn btn-primary">검색</button>
-                            </div>
-                        </div>
-                    </div>
+        <div class="search-bar container-fluid py-3">
+            <div class="row align-items-center">
+                <div class="col-2">
+                    <h5 class="fw-bold">나의 여행첩</h5>
                 </div>
-                <!-- Bottom Section (5/6) -->
-                <div class="flex-item flex-bottom d-flex align-items-center justify-content-center border">
-                    <div class="cards-container container-fluid" style="max-height: 80vh; overflow-y: auto; overflow-x: hidden;">
-                        <div class="row px-5">
+                <div class="col-8 text-end">
+                    <button class="btn btn-primary" @click="fetchMyTrips">내 앨범 새로고침</button>
+                </div>
+            </div>
+        </div>
 
-                            <!-- add card -->
-                            <div class="col-3 mb-5">
-                                <router-link to="/main/postalbum" class="nav-link">
-                                <div class="card d-sm-flex justify-content-center align-items-center"
-                                    style="background-color: #E9E9E9;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#757575"
-                                        class="bi bi-plus-lg" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd"
-                                            d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
-                                    </svg>
-                                </div>
-                                </router-link>
+        <div class="cards-container">
+            <!-- 카드 리스트 -->
+            <div v-if="myTrips.length > 0" v-for="trip in myTrips" :key="trip.tripId" class="card-wrapper">
+                <div class="card">
+                    <!-- 이미지 -->
+                    <div class="card-image">
+                        <img :src="trip.files?.[0]?.filePath || 'http://localhost:8080/uploads/default.png'"
+                            alt="여행지 이미지" class="w-100 h-100" @error="onImageError" />
+                    </div>
+
+                    <!-- 카드 상세 -->
+                    <div class="card-details d-flex flex-column p-3">
+                        <h5 class="text-center fw-bold text-truncate" style="font-size: 1.3rem;">
+                            {{ trip.title }}
+                        </h5>
+                        <p class="text-center text-muted" style="font-size: 0.9rem;">
+                            {{ formatDates(trip.startAt, trip.endAt) }}
+                        </p>
+                        <p class="text-start text-muted" style="font-size: 0.8rem;">
+                            {{ trip.hashtags && trip.hashtags.length > 0 ? trip.hashtags.join(', ') : '#태그없음' }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                ❤ {{ trip.likes }}
                             </div>
-
-                            
-
-                            <!-- Card 1 -->
-                            <div class="col-3 mb-5">
-                                <div class="card">
-                                    <!-- Upper Section (Image) -->
-                                    <div class="card-image">
-                                        <img src="@/assets/images/default.jpg" alt="여행지 이미지" class="w-100 h-100" />
-                                    </div>
-                                    <!-- Lower Section (Details) -->
-                                    <div class="card-details d-flex flex-column p-3" style="height: 100%;">
-                                        <div
-                                            class="flex-item flex-10 d-flex align-items-center justify-content-center px-3">
-                                            <h5 class="text-center fw-bold text-truncate" style="font-size: 1.3rem;">제주도
-                                                여행</h5>
-                                        </div>
-                                        <div class="flex-item flex-2 d-flex align-items-center justify-content-center">
-                                            <h5 class="text-center" style="font-size: 0.7rem;">2023.11.13(월) -
-                                                2023.11.05(수)
-                                            </h5>
-                                        </div>
-                                        <div class="flex-item flex-8 d-flex align-items-center justify-content-center">
-                                            <p class="text-start" style="color: gray; font-size: 0.8rem;">#힐링 #제주도</p>
-                                        </div>
-
-                                        <div
-                                            class="flex-item flex-1 d-flex align-items-center mt-auto justify-content-between">
-                                            <div class="row d-flex justify-content-center">
-                                                <div class="col" style="font-size: 0.75rem;">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                        fill="currentColor" class="bi bi-person-circle"
-                                                        viewBox="0 0 16 16">
-                                                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                                                        <path fill-rule="evenodd"
-                                                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                                                    </svg>
-                                                    이재훈
-                                                </div>
-                                            </div>
-                                            <div class="row d-flex justify-content-center">
-                                                <div class="col" style="font-size: 0.75rem;">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-heart-fill"
-                                                        viewBox="0 0 16 16">
-                                                        <path fill-rule="evenodd"
-                                                            d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314" />
-                                                    </svg>
-                                                    144
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
+                            <small class="text-muted">조회수: {{ trip.overview || 0 }}</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-2 d-flex flex-column p-0">
-
+            <!-- 데이터 없음 -->
+            <div v-else class="no-data-message">
+                <p>등록된 여행첩이 없습니다.</p>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from "vue";
+import axios from "axios";
 
+const API_BASE_URL = "http://localhost:8080/trips/articles/my-album"; // 나의 앨범 API 경로
+const myTrips = ref([]); // 나의 앨범 데이터
+
+// 서버에서 나의 여행첩 데이터 가져오기
+const fetchMyTrips = async () => {
+    try {
+        const response = await axios.get("http://localhost:8080/trips/articles/my-album", {
+            withCredentials: true, // 세션 정보를 포함
+        });
+        console.log("My trips fetched successfully:", response.data);
+    } catch (error) {
+        console.error("Error fetching my trips:", error);
+    }
+};
+
+// 날짜 포맷 함수
+const formatDates = (start, end) => {
+    if (!start || !end) return "날짜 정보 없음";
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const startFormatted = startDate.toLocaleString("ko-KR", options);
+    const endFormatted = endDate.toLocaleString("ko-KR", options);
+
+    return `${startFormatted} ~ ${endFormatted}`;
+};
+
+// 이미지 로드 실패 시 기본 이미지로 설정
+const onImageError = (event) => {
+    event.target.src = "http://localhost:8080/uploads/default.png";
+};
+
+// 컴포넌트 마운트 시 데이터 로드
+onMounted(() => {
+    fetchMyTrips();
+});
 </script>
 
 <style scoped>
+/* 스타일은 Album.vue와 동일하게 설정 */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
 .body-container {
     margin: 0;
     padding: 0;
-}
-
-.row.h-100 {
-    display: flex;
-}
-
-.col-10 {
+    width: 100%;
+    height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-.flex-item {
-    flex-grow: 0;
-    flex-basis: 0;
-    /* 기본 크기 설정 */
-}
-
-.flex-top {
-    flex: 1;
-    /* 1 비율 */
-}
-
-.flex-bottom {
-    flex: 11;
-    /* 5 비율 */
-}
-
-/* Flex ratio */
-.flex-1 {
-  flex: 1;
-}
-.flex-2 {
-  flex: 2;
-}
-.flex-3 {
-  flex: 3;
-}
-.flex-4 {
-  flex: 4;
-}
-
 .cards-container {
-  margin-top: 1rem;
+    flex: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4rem;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 3rem;
+    overflow-y: auto;
+    margin: auto;
 }
 
-.flex-item {
-    flex-grow: 0; /* 기본값 */
-    flex-shrink: 0; /* 기본값 */
+.search-bar {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
 }
 
 .card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: #fff;
-  height: 36vh;
-  width: 27vh;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    height: 40vh;
+    display: flex;
+    transition: transform 0.2s;
+    width: 30vh;
+}
+
+.card:hover {
+    transform: scale(1.05);
 }
 
 .card-image {
-  width: 30vh;
-  height: 20vh;
+    height: 22vh;
 }
 
 .card-image img {
-  object-fit: cover;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
 }
 
+.card-details {
+    padding: 0.5rem 0.5rem 0.3rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: auto;
+}
 
+.card-details h5 {
+    margin: 0.3rem 0;
+    flex-shrink: 0;
+}
 
+.card-details p {
+    margin: 0.2rem 0;
+    flex-shrink: 0;
+}
+
+.card-details .d-flex {
+    margin-top: auto;
+}
+
+.no-data-message {
+    text-align: center;
+    margin-top: 2rem;
+}
 </style>

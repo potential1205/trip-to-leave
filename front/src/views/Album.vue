@@ -40,10 +40,10 @@
 
             <!-- 카드 리스트 -->
             <div v-if="trips.length > 0" v-for="trip in trips" :key="trip.tripId" class="card-wrapper">
-                <div class="card" @click="moveTripDetail(trip.tripId)">
+                <div class="card">
                     <!-- 이미지 -->
                     <div class="card-image">
-                        <img :src="trip.files?.[0]?.filePath || 'http://localhost:8080/default/image/path.png'"
+                        <img :src="trip.files?.[0]?.filePath || 'http://localhost:8080/uploads/default.png'"
                             alt="여행지 이미지" class="w-100 h-100" @error="onImageError" />
                     </div>
 
@@ -82,17 +82,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import { useRouter, useRoute } from 'vue-router';
-
-const router = useRouter();
-const route = useRoute();
-
-const moveTripDetail = async (tripId) => {
-    router.push({
-        path: `/main/album/${tripId}`,
-    });
-}
-
 
 const API_BASE_URL = "http://localhost:8080/trips/articles";
 const trips = ref([]); // 카드 목록
@@ -147,15 +136,28 @@ const formatDates = (start, end) => {
     return `${startFormatted} ~ ${endFormatted}`;
 };
 
+
 const addLike = async (tripId) => {
     try {
-        await axios.post(`${API_BASE_URL}/${tripId}/like`);
-        const trip = trips.value.find((t) => t.tripId === tripId);
-        if (trip) {
-            trip.likes += 1; // 좋아요 수 증가
+        const response = await axios.post(
+            `http://localhost:8080/trips/articles/${tripId}/like`,
+            {}, // POST 요청 본문이 비어 있어도 {} 추가
+            { withCredentials: true } // 세션 정보 포함
+        );
+
+        console.log("Like added successfully:", response.data);
+
+        // 좋아요 성공 시 trips 상태 업데이트
+        const tripIndex = trips.value.findIndex((trip) => trip.tripId === tripId);
+        if (tripIndex !== -1) {
+            trips.value[tripIndex].likes += 1; // 좋아요 수 증가
         }
     } catch (error) {
-        console.error("Error adding like:", error);
+        if (error.response && error.response.data) {
+            console.error("Error adding like:", error.response.data.message);
+        } else {
+            console.error("Unexpected error:", error);
+        }
     }
 };
 
