@@ -21,7 +21,7 @@ public class TripArticleServiceImpl implements TripArticleService {
     // 파일 경로 변환 함수
     private String convertPath(String filePath) {
         if (filePath.startsWith("C:/")) {
-            return filePath.replace("C:/uploads", "http://70.12.50.226:8080/uploads");
+            return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
         }
         return filePath;
     }

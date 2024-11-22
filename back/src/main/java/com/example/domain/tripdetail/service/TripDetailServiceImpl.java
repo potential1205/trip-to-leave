@@ -7,8 +7,7 @@ import com.example.domain.tripdetail.mapper.TripAttractionMapper;
 import com.example.domain.tripdetail.mapper.TripDetailMapper;
 import com.example.domain.tripdetail.mapper.TripFileMapper;
 import com.example.domain.tripdetail.req.CreateTripReq;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.example.domain.tripdetail.dto.TripDetailDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -152,5 +151,24 @@ public class TripDetailServiceImpl implements TripDetailService {
                 }
             }
         }
+    }
+
+    @Override
+    public TripDetailDto getTripDetail(int tripId) {
+        TripDetailDto tripDetailDto = tripDetailMapper.findById(tripId);
+
+        return tripDetailDto;
+    }
+
+    @Override
+    public void deleteTripDetail(int tripId, HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false); // 세션이 없으면 null 반환
+
+        if (session == null) {
+            throw new RuntimeException("접근할 수 없습니다.");
+        }
+
+        tripDetailMapper.deleteById(tripId);
     }
 }

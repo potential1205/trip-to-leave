@@ -2,6 +2,7 @@ package com.example.domain.tripdetail.controller;
 
 import com.example.domain.global.resp.SuccessResp;
 import com.example.domain.tripdetail.req.CreateTripReq;
+import com.example.domain.tripdetail.dto.TripDetailDto;
 import com.example.domain.tripdetail.service.TripDetailService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,26 @@ public class TripDetailController {
         System.out.println(req.toString());
 
         tripDetailService.createTripDetail(req, request);
+
+        return ResponseEntity.ok(
+                new SuccessResp(true)
+        );
+    }
+
+    @GetMapping("/{tripId}")
+    public ResponseEntity<TripDetailDto> getTripDetail(@PathVariable int tripId) {
+
+        TripDetailDto tripDetailDto = tripDetailService.getTripDetail(tripId);
+
+        return ResponseEntity.ok(
+                tripDetailDto
+        );
+    }
+
+    @DeleteMapping("/{tripId}")
+    public ResponseEntity<SuccessResp> deleteTripDetail(@PathVariable int tripId, HttpServletRequest request) {
+
+        tripDetailService.deleteTripDetail(tripId, request);
 
         return ResponseEntity.ok(
                 new SuccessResp(true)

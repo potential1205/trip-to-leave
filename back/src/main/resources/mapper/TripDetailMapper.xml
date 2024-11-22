@@ -43,4 +43,29 @@
             #{tag}
         </foreach>
     </select>
+
+    <!-- TripDetailDto를 반환하는 쿼리 -->
+    <select id="findById" parameterType="int" resultType="com.example.domain.tripdetail.dto.TripDetailDto">
+        SELECT
+            t.title,
+            t.content,
+            t.start_at AS startAt,
+            t.end_at AS endAt,
+            t.headings,
+            m.username AS author,
+            m.member_id as memberId
+        FROM
+            trips t
+                LEFT JOIN
+            members m
+            ON
+                t.member_id = m.member_id
+        WHERE
+            t.trip_id = #{tripId}
+    </select>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM trips
+        WHERE trip_id = #{tripId}
+    </delete>
 </mapper>
