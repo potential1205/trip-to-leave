@@ -31,7 +31,7 @@
       <div v-if="dropdownOpen" class="dropdown-menu position-absolute end-0 mt-2 shadow">
         <router-link to="/main/mypage" class="nav-link dropdown-item">마이페이지</router-link>
         <router-link to="/main/myalbum" class="nav-link dropdown-item">나의 여행첩</router-link>
-        <butoon @click.prevent="handleLogout" class="nav-link dropdown-item">로그아웃</butoon>
+        <button @click.prevent="handleLogout" class="nav-link dropdown-item">로그아웃</button>
       </div>
     </div>
   </div>
