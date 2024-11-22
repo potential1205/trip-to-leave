@@ -25,18 +25,19 @@ public class TripArticleController {
         return ResponseEntity.ok(tripArticles);
     }
 
-    // id로 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<TripArticleDto> getTripArticleById(@PathVariable int id) {
-        TripArticleDto tripArticle = tripArticleService.getTripArticleById(id);
-        return ResponseEntity.ok(tripArticle);
+    // 해시태그 검색
+    @GetMapping("/search-by-hashtag")
+    public ResponseEntity<List<TripArticleDto>> searchByHashtag(@RequestParam String hashtag) {
+        List<TripArticleDto> tripArticles = tripArticleService.searchArticlesByHashtag(hashtag);
+        System.out.println(hashtag);
+        return ResponseEntity.ok(tripArticles);
     }
 
-    // 키워드로 조회
-    @GetMapping("/search")
-    public ResponseEntity<List<TripArticleDto>> searchTripArticleByKeyword(@RequestParam String keyword) {
+    // 키워드 검색
+    @GetMapping("/search-by-keyword")
+    public ResponseEntity<List<TripArticleDto>> searchByKeyword(@RequestParam String keyword) {
         List<TripArticleDto> tripArticles = tripArticleService.searchTripArticles(keyword);
-        return ResponseEntity.ok(tripArticles); // 빈 배열 반환
+        return ResponseEntity.ok(tripArticles);
     }
 
     // 좋아요

@@ -2,22 +2,110 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.example.domain.trip.mapper.TripArticleMapper">
 
-    <select id="getTripArticles" resultType="com.example.domain.trip.dto.TripArticleDto">
+    <resultMap id="TripArticleResultMap" type="com.example.domain.trip.dto.TripArticleDto">
+        <id column="trip_id" property="tripId" />
+        <result column="title" property="title" />
+        <result column="start_at" property="startAt" />
+        <result column="end_at" property="endAt" />
+        <result column="likes" property="likes" />
+        <result column="overview" property="overview" />
+        <result column="author_name" property="authorName" />
+
+        <!-- files 컬렉션 매핑 -->
+        <collection property="files" ofType="com.example.domain.trip.dto.TripFileDto">
+            <id column="file_id" property="fileId" />
+            <result column="file_name" property="fileName" />
+            <result column="file_path" property="filePath" />
+            <result column="content_type" property="contentType" />
+            <result column="file_type" property="fileType" />
+        </collection>
+
+        <!-- hashtags 컬렉션 매핑 -->
+        <collection property="hashtags" ofType="java.lang.String">
+            <result column="hashtag_content" />
+        </collection>
+    </resultMap>
+
+    <select id="getTripArticles" resultMap="TripArticleResultMap">
         SELECT
-            t.trip_id AS tripId,
+        t.trip_id,
+        t.title,
+        t.start_at,
+        t.end_at,
+        t.likes,
+        t.overview,
+        m.username AS author_name,
+        f.file_id,
+        f.file_name,
+        f.file_path,
+        f.content_type,
+        f.file_type,
+        h.hashtag_content
+        FROM
+        trips t
+        JOIN members m ON t.member_id = m.member_id
+        LEFT JOIN trip_files f ON t.trip_id = f.trip_id
+        LEFT JOIN trip_hashtags th ON t.trip_id = th.trip_id
+        LEFT JOIN hashtags h ON th.hashtag_id = h.hashtag_id
+        ORDER BY
+        t.created_at DESC
+    </select>
+
+    <select id="searchArticlesByHashtag" resultMap="TripArticleResultMap">
+        SELECT
+            t.trip_id,
             t.title,
-            t.start_at AS startAt,
-            t.end_at AS endAt,
-            t.cover_image AS coverImage,
+            t.start_at,
+            t.end_at,
             t.likes,
             t.overview,
-            m.username AS authorName
-        FROM trips t
-        JOIN members m ON t.member_id = m.member_id
-        ORDER BY t.created_at DESC ;
+            m.username AS author_name,
+            f.file_id,
+            f.file_name,
+            f.file_path,
+            f.content_type,
+            f.file_type,
+            h.hashtag_content
+        FROM
+            trips t
+                JOIN members m ON t.member_id = m.member_id
+                LEFT JOIN trip_files f ON t.trip_id = f.trip_id
+                LEFT JOIN trip_hashtags th ON t.trip_id = th.trip_id
+                LEFT JOIN hashtags h ON th.hashtag_id = h.hashtag_id
+        WHERE h.hashtag_content = #{hashtag}
+        ORDER BY t.created_at DESC
     </select>
+
+    <!-- 키워드 검색 쿼리 -->
+    <select id="searchTripArticles" resultMap="TripArticleResultMap">
+        SELECT
+            t.trip_id,
+            t.title,
+            t.start_at,
+            t.end_at,
+            t.likes,
+            t.overview,
+            m.username AS author_name,
+            f.file_id,
+            f.file_name,
+            f.file_path,
+            f.content_type,
+            f.file_type,
+            h.hashtag_content
+        FROM
+            trips t
+                JOIN members m ON t.member_id = m.member_id
+                LEFT JOIN trip_files f ON t.trip_id = f.trip_id
+                LEFT JOIN trip_hashtags th ON t.trip_id = th.trip_id
+                LEFT JOIN hashtags h ON th.hashtag_id = h.hashtag_id
+        WHERE
+            t.title LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY
+            t.created_at DESC
+    </select>
+
+
 
 </mapper>

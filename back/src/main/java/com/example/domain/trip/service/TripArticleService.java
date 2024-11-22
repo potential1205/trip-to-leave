@@ -13,7 +13,10 @@ public interface TripArticleService {
 
     List<TripArticleDto> searchTripArticles(String keyword);
 
+    List<TripArticleDto> searchArticlesByHashtag(String hashtag);
+
     void addLikeToTripArticle(int id);
 
     void incrementViewCount(int id);
 }
+
