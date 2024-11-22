@@ -73,7 +73,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         articleMapper.insertArticle(article);
 
-        String uploadDir = "C:/uploads/" + article.getArticleId() + "/";
+        String uploadDir = "C:/uploads/articles/" + article.getArticleId() + "/";
         File uploadDirFile = new File(uploadDir);
         if (!uploadDirFile.exists()) {
             uploadDirFile.mkdirs();

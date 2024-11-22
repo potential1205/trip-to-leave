@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class Attraction {
-    private Integer no;
+    private Integer attractionId;
     private Integer contentId;
     private String title;
     private Integer contentTypeId;
