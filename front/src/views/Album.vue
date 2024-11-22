@@ -40,7 +40,7 @@
 
             <!-- 카드 리스트 -->
             <div v-if="trips.length > 0" v-for="trip in trips" :key="trip.tripId" class="card-wrapper">
-                <div class="card">
+                <div class="card" @click="moveDetail(trip.tripId)">
                     <!-- 이미지 -->
                     <div class="card-image">
                         <img :src="trip.files?.[0]?.filePath || 'http://localhost:8080/uploads/default.png'"
@@ -82,6 +82,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { useRoute, useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const API_BASE_URL = "http://localhost:8080/trips/articles";
 const trips = ref([]); // 카드 목록
@@ -121,6 +124,10 @@ const searchTrips = async () => {
         console.error("Error searching trips:", error);
     }
 };
+
+const moveDetail = (tripId) => {
+    router.push(`/main/album/${tripId}`);
+}
 
 // 날짜 포맷 함수
 const formatDates = (start, end) => {
