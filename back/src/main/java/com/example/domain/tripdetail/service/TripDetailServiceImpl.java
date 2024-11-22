@@ -87,6 +87,7 @@ public class TripDetailServiceImpl implements TripDetailService {
                         .fileName(file.getOriginalFilename())
                         .filePath(filePath)
                         .contentType(file.getContentType())
+                        .fileType("COVER")
                         .build();
 
                 tripFileMapper.insertTripFile(tripFile);
