@@ -17,6 +17,11 @@ public interface TripArticleService {
 
     void addLikeToTripArticle(int id);
 
+    void addLikeToTripArticle(int tripId, int memberId);
+
     void incrementViewCount(int id);
+
+    List<TripArticleDto> getArticlesByMemberId(int memberId);
+
 }
 

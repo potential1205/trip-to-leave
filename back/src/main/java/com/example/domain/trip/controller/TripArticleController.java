@@ -1,7 +1,12 @@
 package com.example.domain.trip.controller;
 
+import com.example.domain.Member;
+import com.example.domain.global.BusinessException;
+import com.example.domain.global.resp.SuccessResp;
 import com.example.domain.trip.dto.TripArticleDto;
 import com.example.domain.trip.service.TripArticleService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("/trips/articles")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class TripArticleController {
 
     private final TripArticleService tripArticleService;
@@ -41,10 +46,15 @@ public class TripArticleController {
     }
 
     // 좋아요
-    @PostMapping("/{id}/like")
-    public ResponseEntity<Void> addLike(@PathVariable int id) {
-        tripArticleService.addLikeToTripArticle(id);
-        return ResponseEntity.ok().build();
+    @PostMapping("/{tripId}/like")
+    public ResponseEntity<SuccessResp> addLike(@PathVariable int tripId, HttpServletRequest request) {
+        Member member = (Member) request.getSession().getAttribute("member");
+        if (member == null) {
+            throw new BusinessException("로그인이 필요합니다.");
+        }
+        tripArticleService.addLikeToTripArticle(tripId, member.getMemberId());
+
+        return ResponseEntity.ok(new SuccessResp(true));
     }
 
     // 조회수
@@ -53,4 +63,19 @@ public class TripArticleController {
         tripArticleService.incrementViewCount(id);
         return ResponseEntity.ok().build();
     }
+
+    // 내 엘범
+    @GetMapping("/my-album")
+    public ResponseEntity<List<TripArticleDto>> getMyAlbum(HttpServletRequest request) {
+        Member member = (Member) request.getSession(false).getAttribute("member");
+
+        if (member == null) {
+            throw new BusinessException("로그인이 필요합니다.");
+        }
+
+        System.out.println("Logged in member ID: " + member.getMemberId());
+        List<TripArticleDto> myAlbums = tripArticleService.getArticlesByMemberId(member.getMemberId());
+        return ResponseEntity.ok(myAlbums);
+    }
+
 }
