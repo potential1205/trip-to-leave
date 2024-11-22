@@ -1,6 +1,7 @@
 package com.example.domain.trip.service;
 
 import com.example.domain.trip.dto.TripArticleDto;
+import com.example.domain.trip.dto.TripFileDto;
 import com.example.domain.trip.mapper.TripArticleMapper;
 import com.example.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -15,54 +16,121 @@ import java.util.List;
 public class TripArticleServiceImpl implements TripArticleService {
 
     private final TripArticleMapper tripArticleMapper;
-    private static final Logger logger = LoggerFactory.getLogger(TripArticleServiceImpl.class); // 로거로 디버깅
+    private static final Logger logger = LoggerFactory.getLogger(TripArticleServiceImpl.class);
+
+    // 파일 경로 변환 함수
+    private String convertPath(String filePath) {
+        if (filePath.startsWith("C:/")) {
+            return filePath.replace("C:/uploads", "http://70.12.50.226:8080/uploads");
+        }
+        return filePath;
+    }
 
     @Override
     public List<TripArticleDto> getAllTripArticles() {
         List<TripArticleDto> tripArticles = tripArticleMapper.getTripArticles();
-        if (tripArticles.isEmpty()) {
-            logger.info("No trip articles found, returning empty list");
+
+        for (TripArticleDto tripArticle : tripArticles) {
+            if (tripArticle.getFiles() != null && !tripArticle.getFiles().isEmpty()) {
+                for (TripFileDto file : tripArticle.getFiles()) {
+                    file.setFilePath(convertPath(file.getFilePath()));
+                }
+                TripFileDto coverImg = tripArticle.getFiles().get(0);
+                logger.info("Cover image for Trip ID {}: {}", tripArticle.getTripId(), coverImg.getFilePath());
+            } else {
+                logger.warn("No files found for Trip ID {}", tripArticle.getTripId());
+            }
+
+            if (tripArticle.getHashtags() != null && !tripArticle.getHashtags().isEmpty()) {
+                logger.info("Hashtags for Trip ID {}: {}", tripArticle.getTripId(), tripArticle.getHashtags());
+            } else {
+                logger.warn("No hashtags found for Trip ID {}", tripArticle.getTripId());
+            }
         }
-        logger.info("Found {} trip articles", tripArticles.size());
-        return tripArticles; // 빈 배열 반환
+
+        if (tripArticles.isEmpty()) {
+            logger.info("No trip articles found, returning empty list.");
+        } else {
+            logger.info("Found {} trip articles.", tripArticles.size());
+        }
+
+        return tripArticles;
     }
 
     @Override
     public TripArticleDto getTripArticleById(int id) {
         TripArticleDto tripArticle = tripArticleMapper.getTripArticleById(id);
+
         if (tripArticle == null) {
             logger.warn("No trip article found for ID: {}", id);
             throw new ResourceNotFoundException("No trip article found for ID: " + id);
         }
-        logger.info("Found trip article {}", tripArticle);
+
+        logger.info("Found trip article: {}", tripArticle);
         return tripArticle;
     }
 
     @Override
     public List<TripArticleDto> searchTripArticles(String keyword) {
         List<TripArticleDto> tripArticles = tripArticleMapper.searchTripArticles(keyword);
-        if (tripArticles.isEmpty()) {
-            logger.info("No trip articles found for keyword: {}, returning empty list", keyword);
+
+        for (TripArticleDto tripArticle : tripArticles) {
+            if (tripArticle.getFiles() != null && !tripArticle.getFiles().isEmpty()) {
+                for (TripFileDto file : tripArticle.getFiles()) {
+                    file.setFilePath(convertPath(file.getFilePath()));
+                }
+            }
         }
-        logger.info("Found {} trip articles for keyword: {}", tripArticles.size(), keyword);
-        return tripArticles; // 빈 배열 반환
+
+        if (tripArticles.isEmpty()) {
+            logger.info("No articles found for keyword '{}'", keyword);
+        } else {
+            logger.info("Found {} articles for keyword '{}'", tripArticles.size(), keyword);
+        }
+
+        return tripArticles;
+    }
+
+    @Override
+    public List<TripArticleDto> searchArticlesByHashtag(String hashtag) {
+        List<TripArticleDto> tripArticles = tripArticleMapper.searchArticlesByHashtag(hashtag);
+
+        for (TripArticleDto tripArticle : tripArticles) {
+            if (tripArticle.getFiles() != null && !tripArticle.getFiles().isEmpty()) {
+                for (TripFileDto file : tripArticle.getFiles()) {
+                    file.setFilePath(convertPath(file.getFilePath()));
+                }
+            }
+        }
+        if (tripArticles.isEmpty()) {
+            logger.info("No articles found for hashtag '{}'", hashtag);
+        } else {
+            logger.info("Found {} articles for hashtag '{}'", tripArticles.size(), hashtag);
+        }
+        return tripArticles;
     }
 
     @Override
     public void addLikeToTripArticle(int id) {
         int rowsAffected = tripArticleMapper.incrementLikes(id);
+
         if (rowsAffected == 0) {
-            logger.warn("Failed to add like to trip article {}", id);
-            throw new ResourceNotFoundException("Failed to add like to trip article " + id);
+            logger.warn("Failed to add like to trip article with ID: {}", id);
+            throw new ResourceNotFoundException("Trip article not found for ID: " + id);
         }
+
+        logger.info("Added like to trip article with ID: {}", id);
     }
 
     @Override
     public void incrementViewCount(int id) {
         int rowsAffected = tripArticleMapper.incrementViewCount(id);
+
         if (rowsAffected == 0) {
-            logger.warn("Failed to add view count to trip article {}", id);
-            throw new ResourceNotFoundException("Failed to add view count to trip article " + id);
+            logger.warn("Failed to increment view count for trip article with ID: {}", id);
+            throw new ResourceNotFoundException("Trip article not found for ID: " + id);
         }
+
+        logger.info("Incremented view count for trip article with ID: {}", id);
     }
 }
