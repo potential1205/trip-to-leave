@@ -20,6 +20,7 @@ public class AttractionDtoMapper {
                 attraction.getFirstImage1(), attraction.getFirstImage2());
 
         AttractionDto dto = new AttractionDto();
+        dto.setAttractionId(attraction.getAttractionId());
         dto.setContentId(attraction.getContentId());
         dto.setTitle(attraction.getTitle());
         dto.setContentTypeId(attraction.getContentTypeId());
