@@ -2,6 +2,7 @@ package com.example.domain.tripdetail.service;
 
 import com.example.domain.*;
 import com.example.domain.global.BusinessException;
+import com.example.domain.trip.dto.TripFileDto;
 import com.example.domain.tripdetail.dto.LocationDto;
 import com.example.domain.tripdetail.mapper.TripAttractionMapper;
 import com.example.domain.tripdetail.mapper.TripDetailMapper;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -127,6 +129,8 @@ public class TripDetailServiceImpl implements TripDetailService {
         }
 
         if (req.getImages() != null && !req.getImages().isEmpty()) {
+            int seq = 0;
+            System.out.println(req.getImages().size());
             for (MultipartFile file : req.getImages()) {
                 try{
                     String filePath = uploadDir + file.getOriginalFilename();
@@ -141,6 +145,7 @@ public class TripDetailServiceImpl implements TripDetailService {
                             .filePath(filePath)
                             .contentType(file.getContentType())
                             .fileType("NORMAL")
+                            .seq(seq++)
                             .build();
 
                     tripFileMapper.insertTripFile(tripFile);
@@ -157,6 +162,14 @@ public class TripDetailServiceImpl implements TripDetailService {
     public TripDetailDto getTripDetail(int tripId) {
         TripDetailDto tripDetailDto = tripDetailMapper.findById(tripId);
 
+        TripFileDto tripFileDto = tripFileMapper.findCoverFile(tripId);
+
+        tripFileDto.setFilePath(convertPath(tripFileDto.getFilePath()));
+
+        tripDetailDto.setCoverImage(tripFileDto);
+
+        List<TripFileDto> images = tripFileMapper.findNormalFile(tripId);
+
         return tripDetailDto;
     }
 
@@ -170,5 +183,12 @@ public class TripDetailServiceImpl implements TripDetailService {
         }
 
         tripDetailMapper.deleteById(tripId);
+    }
+
+    private String convertPath(String filePath) {
+        if (filePath.startsWith("C:/")) {
+            return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
+        }
+        return filePath;
     }
 }

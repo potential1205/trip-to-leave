@@ -32,7 +32,7 @@ public class TripArticleServiceImpl implements TripArticleService {
             return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
         }
         return filePath;
-}
+    }
 
     @Override
     public List<TripArticleDto> getAllTripArticles() {
