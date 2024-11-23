@@ -234,6 +234,7 @@ const createTrip = async () => {
 };
 
 
+
 // 해시태그 관련 상태
 const newHashtag = ref(''); // 새로 입력된 해시태그
 const hashtags = ref([]); // 해시태그 목록
@@ -291,6 +292,8 @@ const handleDrop = async (event) => {
         droppedImages.value.push(file);
     }
 };
+
+
 
 const uploadImage = async (file) => {
     // 클라우드 또는 서버 업로드 처리 후 URL 반환
