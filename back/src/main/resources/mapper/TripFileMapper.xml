@@ -4,9 +4,20 @@
 
     <!-- 파일 삽입 -->
     <insert id="insertTripFile" parameterType="com.example.domain.TripFile" useGeneratedKeys="true" keyProperty="fileId">
-        INSERT INTO trip_files (trip_id, file_name, file_path, content_type, file_type)
-        VALUES (#{tripId}, #{fileName}, #{filePath}, #{contentType}, #{fileType})
+        INSERT INTO trip_files (trip_id, file_name, file_path, content_type, file_type, sequence)
+        VALUES (#{tripId}, #{fileName}, #{filePath}, #{contentType}, #{fileType}, #{seq})
     </insert>
 
+    <!-- 특정 trip_id와 fileType이 COVER인 데이터 조회 -->
+    <select id="findCoverFile" parameterType="int" resultType="com.example.domain.trip.dto.TripFileDto">
+        SELECT file_id, trip_id, file_name, file_path, content_type, file_type
+        FROM trip_files
+        WHERE trip_id = #{tripId} AND file_type = 'COVER'
+    </select>
 
+    <select id="findNormalFile" parameterType="int" resultType="com.example.domain.trip.dto.TripFileDto">
+        SELECT file_id, trip_id, file_name, file_path, content_type, file_type
+        FROM trip_files
+        WHERE trip_id = #{tripId} AND file_type = 'NORMAL'
+    </select>
 </mapper>

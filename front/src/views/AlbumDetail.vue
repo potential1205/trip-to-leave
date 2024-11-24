@@ -22,18 +22,20 @@
       </div>
 
       <div class="col-8 d-flex flex-column m-0 p-0 border overflow-y-scroll" style="height: 90vh;">
+        
+        
         <div class="album-detail-section border p-3">
-          <h2 class="text-center">{{ album.title }}</h2>
+          <h1 class="text-center">{{ album.title }}</h1>
           <p class="text-center fw-bold">{{ album.dateRange }}</p>
           <p class="text-center fw-bold">{{ album.author }}</p>
 
           <!-- 이미지 섹션 -->
           <div v-if="album.imageUrl" class="mb-3 text-center">
-            <img :src="album.imageUrl" alt="앨범 이미지" class="img-fluid rounded" style="width: 50vw;" />
+            <img :src="album.imageUrl" alt="앨범 이미지" class="img-fluid rounded" style="width: 40vw;" />
           </div>
 
           <!-- 마크다운 내용 -->
-          <div v-html="renderedMarkdown" class="markdown-content border p-3"></div>
+          <div v-html="renderedMarkdown" class="markdown-content p-3"></div>
         </div>
 
         <!-- 버튼 섹션 -->
@@ -87,7 +89,8 @@ const goToList = () => {
 };
 
 const editAlbum = () => {
-  console.log('수정 버튼 클릭');
+  const tripId = route.params.id; // 라우트에서 tripId 가져오기
+  router.push(`/main/album/edit/${tripId}`);
 };
 
 const deleteAlbum = async () => {
@@ -123,7 +126,6 @@ const album = ref({
 // 렌더링된 마크다운 내용
 const renderedMarkdown = computed(() => marked(album.value.markdown));
 
-
 // API 호출 및 데이터 업데이트
 const fetchAlbumDetail = async () => {
   try {
@@ -139,9 +141,12 @@ const fetchAlbumDetail = async () => {
       dateRange: `${data.startAt} ~ ${data.endAt}`, // 날짜 범위 포맷
       author: data.author,
       markdown: data.content || '내용이 없습니다.',
-      imageUrl: data.coverImage || '@/assets/images/default.jpg',
-      memberId: data.memberId
+      imageUrl: data.coverImage.filePath,
+      memberId: data.memberId,
+      images: data.images
     };
+
+    updateMarkdownImages();
 
     // headings를 JSON 객체로 변환
     if (data.headings) {
@@ -173,6 +178,29 @@ onMounted(() => {
   fetchAlbumDetail();
   checkSession(album.value.memberId);
 });
+
+//
+// 마크다운 이미지 URL 업데이트 함수
+const updateMarkdownImages = () => {
+  let markdown = album.value.markdown || '';
+
+  // 정규식으로 마크다운 이미지 태그 찾기
+  const imgMarkdownRegex = /!\[([^\]]*)\]\((blob:[^)]+)\)/g;
+  let index = 0;
+
+  // 이미지 태그를 순서대로 매핑
+  markdown = markdown.replace(imgMarkdownRegex, (match, altText) => {
+    if (album.value.images && album.value.images[index]) {
+      const filePath = album.value.images[index].filePath;
+      index++;
+      return `![${altText}](${filePath})`;
+    }
+    return ''; // 이미지가 없으면 태그를 제거
+  });
+
+  // 갱신된 마크다운을 album.value에 반영
+  album.value.markdown = markdown;
+};
 
 const userName = ref(''); // 사용자 이름을 저장할 변수
 onMounted(async () => {
@@ -211,5 +239,28 @@ onMounted(async () => {
 .nav-link {
   color: #007bff;
   text-decoration: none;
+}
+
+/* 스크롤바 너비 설정 */
+::-webkit-scrollbar {
+    width: 6px; /* 세로 스크롤 */
+    height: 6px; /* 가로 스크롤 */
+}
+
+/* 스크롤바 트랙 (배경) */
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* 트랙 배경색 */
+    border-radius: 5px; /* 모서리 둥글게 */
+}
+
+/* 스크롤바 핸들 (스크롤 이동 영역) */
+::-webkit-scrollbar-thumb {
+    background: lightgray; /* 핸들 색상 */
+    border-radius: 5px; /* 모서리 둥글게 */
+}
+
+/* 스크롤바 핸들 Hover 상태 */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Hover 시 색상 */
 }
 </style>

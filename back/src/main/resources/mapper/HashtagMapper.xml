@@ -11,4 +11,18 @@
         ON DUPLICATE KEY UPDATE hashtag_content = hashtag_content;
     </insert>
 
+    <!-- 해시태그 목록 조회 -->
+    <select id="selectHashtagsByTripId" parameterType="int" resultType="string">
+        SELECT
+            h.hashtag_content AS hashtagContent
+        FROM
+            hashtags h
+                JOIN
+            trip_hashtags th
+            ON
+                h.hashtag_id = th.hashtag_id
+        WHERE
+            th.trip_id = #{tripId}
+    </select>
+
 </mapper>

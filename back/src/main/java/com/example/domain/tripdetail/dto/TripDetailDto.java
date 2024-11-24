@@ -1,5 +1,6 @@
 package com.example.domain.tripdetail.dto;
 
+import com.example.domain.trip.dto.TripFileDto;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,5 +21,7 @@ public class TripDetailDto {
     private LocalDate startAt;
     private LocalDate endAt;
     private String headings;
-    private MultipartFile coverImage;
+    private TripFileDto coverImage;
+    private List<TripFileDto> images;
+    private List<String> hashtagList;
 }

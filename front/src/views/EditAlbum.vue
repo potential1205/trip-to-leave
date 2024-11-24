@@ -156,7 +156,8 @@
 
                 <!-- 게시글 작성 완료 버튼 -->
                 <div class="text-center mt-4">
-                    <button class="btn btn-success" @click="createTrip">작성 완료</button>
+                    <button class="btn btn-success mx-3" @click="createTrip">수정 완료</button>
+                    <button class="btn btn-secondary mx-3" @click="moveToDetail">취소</button>
                 </div>
             </div>
         </div>
@@ -165,13 +166,78 @@
 
 
 <script setup>
-import { ref, computed, watchEffect } from 'vue';
+import { ref, computed, watchEffect, onMounted } from 'vue';
 import { marked } from 'marked';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 
 const router = useRouter();
+const route = useRoute();
 const postImageFile = ref(null);
+
+
+// 정보 불러오기
+const album = ref({
+  id: '',
+  title: '',
+  dateRange: '',
+  startDate:'',
+  endDate:'',
+  author: '',
+  markdown: '',
+  imageUrl: '',
+  memberId: 0,
+  hashtags: [],
+  headings:''
+});
+
+const moveToDetail = () => {
+  const tripId = route.params.id; // 라우트에서 tripId 가져오기
+  router.push(`/main/album/${tripId}`);
+};
+
+
+// API 호출 및 데이터 업데이트
+const fetchAlbumDetail = async () => {
+  try {
+    const tripId = route.params.id; // 라우트에서 ID 가져오기
+    const response = await axios.get(`http://localhost:8080/tripdetail/${tripId}`); // API 호출
+    const data = response.data;
+    console.log('API 호출 성공:', data);
+
+    // 데이터 매핑
+    album.value = {
+      id: tripId,
+      title: data.title,
+      dateRange: `${data.startAt} ~ ${data.endAt}`, // 날짜 범위 포맷
+      startDate: data.startAt,
+      endDate: data.endAt,
+      author: data.author,
+      markdown: data.content || '내용이 없습니다.',
+      imageUrl: data.coverImage.filePath,
+      memberId: data.memberId,
+      images: data.images,
+      hashtags: data.hashtagList,
+      headings: data.headings
+    };
+
+    startDate.value = album.value.startDate;
+    endDate.value = album.value.endDate;
+    postTitle.value = album.value.title;
+    hashtags.value = album.value.hashtags;
+    headings.value = JSON.parse(album.value.headings);
+    postImage.value = album.value.imageUrl;
+    authorName.value = album.value.author;
+
+  } catch (error) {
+    console.error('API 호출 중 오류 발생:', error);
+  }
+};
+
+onMounted(() => {
+  fetchAlbumDetail();
+});
+
 
 const createTrip = async () => {
     // 기본 데이터 검증

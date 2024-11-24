@@ -2,6 +2,8 @@ package com.example.domain.tripdetail.service;
 
 import com.example.domain.*;
 import com.example.domain.global.BusinessException;
+import com.example.domain.trip.dto.TripFileDto;
+import com.example.domain.tripdetail.dto.HashtagDto;
 import com.example.domain.tripdetail.dto.LocationDto;
 import com.example.domain.tripdetail.mapper.TripAttractionMapper;
 import com.example.domain.tripdetail.mapper.TripDetailMapper;
@@ -12,12 +14,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -127,6 +134,8 @@ public class TripDetailServiceImpl implements TripDetailService {
         }
 
         if (req.getImages() != null && !req.getImages().isEmpty()) {
+            int seq = 0;
+            System.out.println(req.getImages().size());
             for (MultipartFile file : req.getImages()) {
                 try{
                     String filePath = uploadDir + file.getOriginalFilename();
@@ -141,6 +150,7 @@ public class TripDetailServiceImpl implements TripDetailService {
                             .filePath(filePath)
                             .contentType(file.getContentType())
                             .fileType("NORMAL")
+                            .seq(seq++)
                             .build();
 
                     tripFileMapper.insertTripFile(tripFile);
@@ -157,6 +167,24 @@ public class TripDetailServiceImpl implements TripDetailService {
     public TripDetailDto getTripDetail(int tripId) {
         TripDetailDto tripDetailDto = tripDetailMapper.findById(tripId);
 
+        // 커버 이미지
+        TripFileDto tripFileDto = tripFileMapper.findCoverFile(tripId);
+        tripFileDto.setFilePath(convertPath(tripFileDto.getFilePath()));
+        tripDetailDto.setCoverImage(tripFileDto);
+
+        // 컨텐츠 이미지
+        List<TripFileDto> images = tripFileMapper.findNormalFile(tripId);
+        for (TripFileDto imageDto : images) {
+            String newPath = convertPath(imageDto.getFilePath());
+            imageDto.setFilePath(newPath);
+        }
+
+        tripDetailDto.setImages(images);
+
+        // 해시태그 불러오기
+        List<String> hashtagList = tripDetailMapper.selectHashtagsByTripId(tripId);
+        tripDetailDto.setHashtagList(hashtagList);
+
         return tripDetailDto;
     }
 
@@ -170,5 +198,12 @@ public class TripDetailServiceImpl implements TripDetailService {
         }
 
         tripDetailMapper.deleteById(tripId);
+    }
+
+    private String convertPath(String filePath) {
+        if (filePath.startsWith("C:/")) {
+            return filePath.replace("C:/uploads", "http://localhost:8080/uploads");
+        }
+        return filePath;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.domain.tripdetail.mapper;
 
 import com.example.domain.Trip;
+import com.example.domain.tripdetail.dto.HashtagDto;
 import com.example.domain.tripdetail.dto.TripDetailDto;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.ibatis.annotations.Mapper;
@@ -20,4 +21,6 @@ public interface TripDetailMapper {
     TripDetailDto findById(int tripId);
 
     void deleteById(int tripId);
+
+    List<String> selectHashtagsByTripId(int tripId);
 }

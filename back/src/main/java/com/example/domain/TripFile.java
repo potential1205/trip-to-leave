@@ -16,4 +16,5 @@ public class TripFile {
     private String filePath; // 파일 경로
     private String contentType; // 파일 타입 (MIME 타입)
     private String fileType;
+    private int seq;
 }

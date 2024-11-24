@@ -65,6 +65,12 @@ const router = createRouter({
           component: () => import('../views/AlbumDetail.vue'),
           props: true,
         },
+        {
+          path: 'album/edit/:id',
+          name: 'editAlbum',
+          component: () => import('../views/EditAlbum.vue'),
+          props: true,
+        },
       ],
     },
   ],

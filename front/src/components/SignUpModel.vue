@@ -70,9 +70,8 @@ const handleSignUp = async () => {
 
     console.log('회원가입 성공:', response.data);
     alert('회원가입이 완료되었습니다!');
-
-    // 회원가입 성공 시 추가 동작 (예: 로그인 페이지로 이동)
-    router.push('/'); // Vue Router 사용 시
+    closeModal();
+    
   } catch (error) {
     console.error('회원가입 실패:', error.response?.data || error.message);
 

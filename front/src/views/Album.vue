@@ -99,6 +99,7 @@ const fetchTrips = async () => {
             console.warn("No data available");
         }
         trips.value = response.data;
+        console.log(trips.value)
     } catch (error) {
         console.error("Error fetching trips:", error);
         trips.value = []; // 오류 시 빈 배열로 초기화
