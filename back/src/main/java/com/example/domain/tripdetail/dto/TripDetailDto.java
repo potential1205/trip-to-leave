@@ -23,4 +23,5 @@ public class TripDetailDto {
     private String headings;
     private TripFileDto coverImage;
     private List<TripFileDto> images;
+    private List<String> hashtagList;
 }
