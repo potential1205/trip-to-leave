@@ -89,7 +89,8 @@ const goToList = () => {
 };
 
 const editAlbum = () => {
-  console.log('수정 버튼 클릭');
+  const tripId = route.params.id; // 라우트에서 tripId 가져오기
+  router.push(`/main/album/edit/${tripId}`);
 };
 
 const deleteAlbum = async () => {
@@ -125,7 +126,6 @@ const album = ref({
 // 렌더링된 마크다운 내용
 const renderedMarkdown = computed(() => marked(album.value.markdown));
 
-
 // API 호출 및 데이터 업데이트
 const fetchAlbumDetail = async () => {
   try {
@@ -142,10 +142,11 @@ const fetchAlbumDetail = async () => {
       author: data.author,
       markdown: data.content || '내용이 없습니다.',
       imageUrl: data.coverImage.filePath,
-      memberId: data.memberId
+      memberId: data.memberId,
+      images: data.images
     };
 
-    console.log(album.value.imageUrl);
+    updateMarkdownImages();
 
     // headings를 JSON 객체로 변환
     if (data.headings) {
@@ -177,6 +178,29 @@ onMounted(() => {
   fetchAlbumDetail();
   checkSession(album.value.memberId);
 });
+
+//
+// 마크다운 이미지 URL 업데이트 함수
+const updateMarkdownImages = () => {
+  let markdown = album.value.markdown || '';
+
+  // 정규식으로 마크다운 이미지 태그 찾기
+  const imgMarkdownRegex = /!\[([^\]]*)\]\((blob:[^)]+)\)/g;
+  let index = 0;
+
+  // 이미지 태그를 순서대로 매핑
+  markdown = markdown.replace(imgMarkdownRegex, (match, altText) => {
+    if (album.value.images && album.value.images[index]) {
+      const filePath = album.value.images[index].filePath;
+      index++;
+      return `![${altText}](${filePath})`;
+    }
+    return ''; // 이미지가 없으면 태그를 제거
+  });
+
+  // 갱신된 마크다운을 album.value에 반영
+  album.value.markdown = markdown;
+};
 
 const userName = ref(''); // 사용자 이름을 저장할 변수
 onMounted(async () => {
