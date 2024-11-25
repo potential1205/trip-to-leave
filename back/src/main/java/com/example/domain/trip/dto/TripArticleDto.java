@@ -19,6 +19,7 @@ public class TripArticleDto {
     private int likes;
     private int overview;
     private String authorName;
+    private TripFileDto coverImg;
     private List<TripFileDto> files; // 파일 리스트
     private List<String> hashtags; // 해시태그 리스트
 }

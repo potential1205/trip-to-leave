@@ -12,7 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CreateTripReq {
+public class UpdateTripReq {
+    private int tripId;
     private String title;
     private String content;
     private LocalDate startAt;

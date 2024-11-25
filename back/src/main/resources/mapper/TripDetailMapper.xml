@@ -30,10 +30,30 @@
                )
     </insert>
 
+    <!-- UPDATE trips -->
+    <update id="update" parameterType="com.example.domain.Trip">
+        UPDATE trips
+        SET
+            member_id = #{memberId},
+            title = #{title},
+            content = #{content},
+            updated_at = NOW(),
+            start_at = #{startAt},
+            end_at = #{endAt},
+            headings = #{headings}
+        WHERE
+            trip_id = #{tripId}
+    </update>
+
     <insert id="insertTripHashtag">
         INSERT INTO trip_hashtags (trip_id, hashtag_id)
         VALUES (#{tripId}, #{hashtagId});
     </insert>
+
+    <delete id="deleteHashtagsById" parameterType="int">
+        DELETE FROM trip_hashtags
+        WHERE trip_id = #{tripId}
+    </delete>
 
     <select id="findIdsByTags" resultType="int">
         SELECT hashtag_id
