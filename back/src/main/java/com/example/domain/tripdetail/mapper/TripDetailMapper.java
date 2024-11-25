@@ -23,4 +23,8 @@ public interface TripDetailMapper {
     void deleteById(int tripId);
 
     List<String> selectHashtagsByTripId(int tripId);
+
+    void update(Trip trip);
+
+    void deleteHashtagsById(int tripId);
 }

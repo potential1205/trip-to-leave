@@ -14,4 +14,10 @@ public interface TripFileMapper {
     TripFileDto findCoverFile(int tripId);
 
     List<TripFileDto> findNormalFile(int tripId);
+
+    void deleteCoverImg(int tripId);
+
+    void deleteImages(int tripId);
+
+    int getFileCountByTripId(int tripId);
 }

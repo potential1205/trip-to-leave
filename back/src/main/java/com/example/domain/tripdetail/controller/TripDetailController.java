@@ -1,8 +1,10 @@
 package com.example.domain.tripdetail.controller;
 
 import com.example.domain.global.resp.SuccessResp;
+import com.example.domain.trip.dto.TripFileDto;
 import com.example.domain.tripdetail.req.CreateTripReq;
 import com.example.domain.tripdetail.dto.TripDetailDto;
+import com.example.domain.tripdetail.req.UpdateTripReq;
 import com.example.domain.tripdetail.service.TripDetailService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +32,11 @@ public class TripDetailController {
     }
 
     @PatchMapping(value="",consumes = {"multipart/form-data"})
-    public ResponseEntity<SuccessResp> updateTripDetail(@ModelAttribute CreateTripReq req, HttpServletRequest request) {
+    public ResponseEntity<SuccessResp> updateTripDetail(@ModelAttribute UpdateTripReq req, HttpServletRequest request) {
 
         System.out.println(req.toString());
+
+        tripDetailService.updateTripDetail(req, request);
 
         return ResponseEntity.ok(
                 new SuccessResp(true)
@@ -43,6 +47,10 @@ public class TripDetailController {
     public ResponseEntity<TripDetailDto> getTripDetail(@PathVariable int tripId) {
 
         TripDetailDto tripDetailDto = tripDetailService.getTripDetail(tripId);
+
+        for(TripFileDto dto : tripDetailDto.getImages()) {
+            System.out.println(dto.toString());
+        }
 
         return ResponseEntity.ok(
                 tripDetailDto

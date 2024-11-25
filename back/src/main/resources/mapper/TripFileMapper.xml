@@ -3,7 +3,7 @@
 <mapper namespace="com.example.domain.tripdetail.mapper.TripFileMapper">
 
     <!-- 파일 삽입 -->
-    <insert id="insertTripFile" parameterType="com.example.domain.TripFile" useGeneratedKeys="true" keyProperty="fileId">
+    <insert id="insertTripFile" parameterType="com.example.domain.TripFile">
         INSERT INTO trip_files (trip_id, file_name, file_path, content_type, file_type, sequence)
         VALUES (#{tripId}, #{fileName}, #{filePath}, #{contentType}, #{fileType}, #{seq})
     </insert>
@@ -19,5 +19,22 @@
         SELECT file_id, trip_id, file_name, file_path, content_type, file_type
         FROM trip_files
         WHERE trip_id = #{tripId} AND file_type = 'NORMAL'
+        ORDER BY sequence ASC
+    </select>
+
+    <delete id="deleteCoverImg" parameterType="int">
+        DELETE FROM trip_files
+        WHERE trip_id = #{tripId} and file_type = 'COVER'
+    </delete>
+
+    <delete id="deleteImages" parameterType="int">
+        DELETE FROM trip_files
+        WHERE trip_id = #{tripId} and file_type = 'NORMAL'
+    </delete>
+
+    <select id="getFileCountByTripId" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM trip_files
+        WHERE trip_id = #{tripId} and file_type = 'NORMAL'
     </select>
 </mapper>

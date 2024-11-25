@@ -22,8 +22,8 @@
       </div>
 
       <div class="col-8 d-flex flex-column m-0 p-0 border overflow-y-scroll" style="height: 90vh;">
-        
-        
+
+
         <div class="album-detail-section border p-3">
           <h1 class="text-center">{{ album.title }}</h1>
           <p class="text-center fw-bold">{{ album.dateRange }}</p>
@@ -182,24 +182,27 @@ onMounted(() => {
 //
 // 마크다운 이미지 URL 업데이트 함수
 const updateMarkdownImages = () => {
-  let markdown = album.value.markdown || '';
+  let markdown = album.value.markdown || "";
 
-  // 정규식으로 마크다운 이미지 태그 찾기
-  const imgMarkdownRegex = /!\[([^\]]*)\]\((blob:[^)]+)\)/g;
+  // 정규식으로 모든 이미지 태그 찾기 (http, https, blob 등)
+  const imgMarkdownRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+
+  // 이미지 매핑 시작
   let index = 0;
-
-  // 이미지 태그를 순서대로 매핑
-  markdown = markdown.replace(imgMarkdownRegex, (match, altText) => {
+  markdown = markdown.replace(imgMarkdownRegex, (match, altText, src) => {
+    // images 배열에서 순서대로 filePath 가져오기
     if (album.value.images && album.value.images[index]) {
       const filePath = album.value.images[index].filePath;
-      index++;
-      return `![${altText}](${filePath})`;
+      index++; // 다음 이미지로 이동
+      return `![${altText}](${filePath})`; // 새로운 URL로 대체
     }
-    return ''; // 이미지가 없으면 태그를 제거
+    return match; // 매핑 실패 시 원래 태그 반환
   });
 
   // 갱신된 마크다운을 album.value에 반영
   album.value.markdown = markdown;
+
+  console.log("Updated Markdown:", markdown); // 디버깅용 로그
 };
 
 const userName = ref(''); // 사용자 이름을 저장할 변수
@@ -243,24 +246,31 @@ onMounted(async () => {
 
 /* 스크롤바 너비 설정 */
 ::-webkit-scrollbar {
-    width: 6px; /* 세로 스크롤 */
-    height: 6px; /* 가로 스크롤 */
+  width: 6px;
+  /* 세로 스크롤 */
+  height: 6px;
+  /* 가로 스크롤 */
 }
 
 /* 스크롤바 트랙 (배경) */
 ::-webkit-scrollbar-track {
-    background: #f1f1f1; /* 트랙 배경색 */
-    border-radius: 5px; /* 모서리 둥글게 */
+  background: #f1f1f1;
+  /* 트랙 배경색 */
+  border-radius: 5px;
+  /* 모서리 둥글게 */
 }
 
 /* 스크롤바 핸들 (스크롤 이동 영역) */
 ::-webkit-scrollbar-thumb {
-    background: lightgray; /* 핸들 색상 */
-    border-radius: 5px; /* 모서리 둥글게 */
+  background: lightgray;
+  /* 핸들 색상 */
+  border-radius: 5px;
+  /* 모서리 둥글게 */
 }
 
 /* 스크롤바 핸들 Hover 상태 */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Hover 시 색상 */
+  background: #555;
+  /* Hover 시 색상 */
 }
 </style>

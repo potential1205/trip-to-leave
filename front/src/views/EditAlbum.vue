@@ -156,7 +156,7 @@
 
                 <!-- 게시글 작성 완료 버튼 -->
                 <div class="text-center mt-4">
-                    <button class="btn btn-success mx-3" @click="createTrip">수정 완료</button>
+                    <button class="btn btn-success mx-3" @click="updateTrip">수정 완료</button>
                     <button class="btn btn-secondary mx-3" @click="moveToDetail">취소</button>
                 </div>
             </div>
@@ -236,12 +236,26 @@ const fetchAlbumDetail = async () => {
     }
 };
 
+const mapLocationsToHeadings = (locations) => {
+    locations.forEach((locationData) => {
+        const heading = headings.value.find(
+            (h) => h.level === locationData.level && h.text === locationData.text
+        );
+        if (heading) {
+            heading.locations = locationData.locations;
+        }
+    });
+};
+
 onMounted(() => {
     fetchAlbumDetail();
+    fetchAlbumDetail().then(() => {
+        const locationsData = JSON.parse(album.value.headings);
+        mapLocationsToHeadings(locationsData);
+    });
 });
 
-
-const createTrip = async () => {
+const updateTrip = async () => {
     // 기본 데이터 검증
     if (!postTitle.value.trim()) {
         alert("제목을 입력하세요.");
@@ -265,29 +279,34 @@ const createTrip = async () => {
     formData.append("startAt", startDate.value);
     formData.append("endAt", endDate.value);
 
-    // 해시태그 추가
+    // // 해시태그 추가
     hashtags.value.forEach((hashtag) => formData.append("hashTags", hashtag));
 
-    // 업로드된 파일 객체
-    formData.append("coverImage", postImageFile.value);
+    // // 업로드된 파일 객체
+    if (postImageFile.value) {
+        formData.append("coverImage", postImageFile.value);
+    }
 
-    // 헤딩 정보
+    // // 헤딩 정보
     formData.append("headings", JSON.stringify(headings.value));
 
-    // 장소 정보 추가
+    // // 장소 정보 추가
     headings.value.forEach((heading, headingIndex) => {
         heading.locations.forEach((location, locationIndex) => {
             formData.append(`locations[${headingIndex}][${locationIndex}]`, JSON.stringify(location));
         });
     });
 
-    // 마크다운 이미지 파일
+    // // 마크다운 이미지 파일
     droppedImages.value.forEach((file, index) => {
         formData.append(`images[${index}]`, file); // 파일 데이터를 images 배열로 전송
     });
 
+    const tripId = route.params.id;
+    formData.append("tripId", tripId);
+
     try {
-        const response = await axios.post("http://localhost:8080/tripdetail", formData, {
+        const response = await axios.patch("http://localhost:8080/tripdetail", formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             }, withCredentials: true, // 세션 쿠키 포함
@@ -445,19 +464,33 @@ const renderedMarkdown = computed(() => marked(markdown.value));
 const headings = ref([]);
 
 // `watchEffect`로 `headings` 업데이트
+// watchEffect(() => {
+//     if (!headings.value.length || headings.value.some((h) => !h.locations)) {
+//         const lines = markdown.value.split('\n');
+//         headings.value = lines
+//             .filter((line) => line.startsWith('#'))
+//             .map((line) => {
+//                 const level = line.match(/^#+/)[0].length;
+//                 const text = line.replace(/^#+\s*/, '');
+//                 const id = text.toLowerCase().replace(/ /g, '-');
+//                 return { level, text, id, locations: [] }; // 초기화된 locations
+//             });
+//     }
+// });
+
 watchEffect(() => {
-    if (!headings.value.length || headings.value.some((h) => !h.locations)) {
-        const lines = markdown.value.split('\n');
-        headings.value = lines
-            .filter((line) => line.startsWith('#'))
-            .map((line) => {
-                const level = line.match(/^#+/)[0].length;
-                const text = line.replace(/^#+\s*/, '');
-                const id = text.toLowerCase().replace(/ /g, '-');
-                return { level, text, id, locations: [] }; // 초기화된 locations
-            });
-    }
+    const lines = markdown.value.split('\n');
+    headings.value = lines
+        .filter((line) => line.startsWith('#'))
+        .map((line) => {
+            const level = line.match(/^#+/)[0].length;
+            const text = line.replace(/^#+\s*/, '');
+            const id = text.toLowerCase().replace(/ /g, '-');
+            return { level, text, id, locations: [] }; // locations 필드 포함
+        });
 });
+
+
 
 // 목차 스크롤
 const scrollToHeading = (id) => {

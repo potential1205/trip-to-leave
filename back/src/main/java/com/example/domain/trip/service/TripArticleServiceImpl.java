@@ -43,6 +43,7 @@ public class TripArticleServiceImpl implements TripArticleService {
                 for (TripFileDto file : tripArticle.getFiles()) {
                     file.setFilePath(convertPath(file.getFilePath()));
                 }
+                
                 TripFileDto coverImg = tripArticle.getFiles().get(0);
                 logger.info("Cover image for Trip ID {}: {}", tripArticle.getTripId(), coverImg.getFilePath());
             } else {

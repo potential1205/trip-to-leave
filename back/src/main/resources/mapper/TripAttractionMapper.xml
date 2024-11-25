@@ -10,4 +10,8 @@
         VALUES (#{tripId}, #{attractionId}, NOW());
     </insert>
 
+    <delete id="deleteTripAttraction" parameterType="int">
+        DELETE FROM trips_attractions
+        WHERE trip_id = #{tripId}
+    </delete>
 </mapper>

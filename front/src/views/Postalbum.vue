@@ -293,13 +293,6 @@ const handleDrop = async (event) => {
     }
 };
 
-
-
-const uploadImage = async (file) => {
-    // 클라우드 또는 서버 업로드 처리 후 URL 반환
-    return 'https://example.com/path-to-uploaded-image.jpg';
-};
-
 // 상태 변수
 const isBasicInfo = ref(true); // 기본 정보 작성 화면 활성화 여부
 const isMarkdownEditor = ref(false); // 마크다운 작성 화면 활성화 여부

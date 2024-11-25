@@ -46,7 +46,7 @@
         FROM
         trips t
         JOIN members m ON t.member_id = m.member_id
-        LEFT JOIN trip_files f ON t.trip_id = f.trip_id
+        LEFT JOIN trip_files f ON t.trip_id = f.trip_id and f.file_type = 'COVER'
         LEFT JOIN trip_hashtags th ON t.trip_id = th.trip_id
         LEFT JOIN hashtags h ON th.hashtag_id = h.hashtag_id
         ORDER BY
