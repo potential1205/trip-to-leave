@@ -67,9 +67,15 @@ public class TripArticleController {
     // 내 엘범
     @GetMapping("/my-album")
     public ResponseEntity<List<TripArticleDto>> getMyAlbum(HttpServletRequest request) {
-        Member member = (Member) request.getSession(false).getAttribute("member");
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            System.out.println("Session is null");
+            throw new BusinessException("로그인이 필요합니다.");
+        }
 
+        Member member = (Member) session.getAttribute("member");
         if (member == null) {
+            System.out.println("Member is null in session");
             throw new BusinessException("로그인이 필요합니다.");
         }
 
