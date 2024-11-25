@@ -117,7 +117,7 @@ public class AttractionController {
             response.put("description", gptResponse);
 
             return ResponseEntity.ok(response);
-        } catch (ClassCastException e) {
+            } catch (ClassCastException e) {
             logger.error("Type casting error in requestBody", e);
             return ResponseEntity.badRequest().body("Invalid data format in requestBody");
         } catch (Exception e) {
