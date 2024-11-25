@@ -14,7 +14,7 @@
                         <!-- 장소 목록 표시 -->
                         <ul>
                             <li v-for="location in item.locations" :key="location">
-                                <span>{{ location.title }}</span>
+                                <span @click="selectDetailLocation(location)" style="cursor: pointer;">{{ location.title }}</span>
                                 <button class="btn btn-danger btn-sm ms-2"
                                     @click="removeLocation(index, locIndex)">삭제</button>
                             </li>
@@ -154,6 +154,12 @@
                     </div>
                 </div>
 
+                <!-- 추가된 장소 상세 정보 섹션 -->
+                <div class="col-8 d-flex flex-column m-0 p-3 border">
+                    <h4>장소 상세 정보</h4>
+                    <LocationDetails :location="selectedLocationDetails" />
+                </div>
+
                 <!-- 게시글 작성 완료 버튼 -->
                 <div class="text-center mt-4">
                     <button class="btn btn-success" @click="createTrip">작성 완료</button>
@@ -169,6 +175,7 @@ import { ref, computed, watchEffect } from 'vue';
 import { marked } from 'marked';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import LocationDetails from "@/components/LocationDetails.vue"; 
 
 const router = useRouter();
 const postImageFile = ref(null);
@@ -232,7 +239,6 @@ const createTrip = async () => {
         alert("여행 계획 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
 };
-
 
 
 // 해시태그 관련 상태
@@ -422,6 +428,59 @@ const closeLocationSearch = () => {
 const cancelLocationSelection = () => {
     closeLocationSearch();
 };
+
+// gpt
+const isLoadingDetails = ref(false); // 로딩 상태 추가
+const selectedLocationDetails = ref(null);
+
+const selectDetailLocation = async (location) => {
+    // 데이터 매핑 및 기본값 설정
+    const selectedLocationData = {
+        title: location.title || "제목 없음", // title 기본값 설정
+        lat: location.latitude !== undefined ? location.latitude : null, /
+        lng: location.longitude !== undefined ? location.longitude : null, // longitude 값을 lng에 매핑
+        addr1: location.addr1 || "주소 정보 없음", // 상세 주소 추가
+        firstImage1: location.firstImage1 || "", // 이미지 기본값 설정
+    };
+
+    console.log("Location data being sent:", selectedLocationData);
+
+    // 필수 데이터 검증
+    if (!selectedLocationData.lat || !selectedLocationData.lng) {
+        console.error("위도와 경도가 누락되었습니다.");
+        alert("위도와 경도 정보가 누락되어 상세 정보를 가져올 수 없습니다.");
+        return;
+    }
+
+    isLoadingDetails.value = true;
+
+    try {
+        // 서버로 데이터 전송
+        const response = await axios.post(
+            "http://localhost:8080/attractions/details",
+            selectedLocationData
+        );
+
+        // 서버 응답을 상태에 저장
+        selectedLocationDetails.value = response.data;
+    } catch (error) {
+        console.error("Error fetching location details:", error);
+
+        // 기본 설명 추가
+        selectedLocationDetails.value = {
+            title: selectedLocationData.title,
+            lat: selectedLocationData.lat,
+            lng: selectedLocationData.lng,
+            addr1: selectedLocationData.addr1,
+            firstImage1: selectedLocationData.firstImage1,
+            description: "상세 정보를 가져오는 데 실패했습니다.",
+        };
+    } finally {
+        isLoadingDetails.value = false;
+    }
+};
+
+
 
 </script>
 
