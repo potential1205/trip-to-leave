@@ -35,7 +35,7 @@
           </div>
 
           <!-- 마크다운 내용 -->
-          <div v-html="renderedMarkdown" class="markdown-content p-3"></div>
+          <div v-html="renderedMarkdown" class="markdown-content p-5"></div>
         </div>
 
         <!-- 버튼 섹션 -->
@@ -124,7 +124,15 @@ const album = ref({
 });
 
 // 렌더링된 마크다운 내용
-const renderedMarkdown = computed(() => marked(album.value.markdown));
+const renderedMarkdown = computed(() => {
+  // 마크다운을 HTML로 변환
+  let html = marked(album.value.markdown);
+
+  // 이미지 태그를 중앙 정렬하기 위해 <div>로 감싸기
+  html = html.replace(/<img([^>]+)>/g, '<div style="text-align: center;"><img $1 style="display: inline-block; width: 500px;" /></div>');
+
+  return html;
+});
 
 // API 호출 및 데이터 업데이트
 const fetchAlbumDetail = async () => {

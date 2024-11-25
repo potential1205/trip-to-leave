@@ -163,6 +163,7 @@ public class TripDetailServiceImpl implements TripDetailService {
 
     @Override
     public TripDetailDto getTripDetail(int tripId) {
+        tripDetailMapper.addOverview(tripId);
         TripDetailDto tripDetailDto = tripDetailMapper.findById(tripId);
 
         // 커버 이미지

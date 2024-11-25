@@ -88,4 +88,10 @@
         DELETE FROM trips
         WHERE trip_id = #{tripId}
     </delete>
+
+    <update id="addOverview" parameterType="int">
+        UPDATE trips
+        SET overview = overview + 1
+        WHERE trip_id = #{tripId}
+    </update>
 </mapper>

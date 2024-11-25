@@ -60,7 +60,7 @@
                         </p>
                         <div class="d-flex justify-content-between align-items-center mt-auto">
                             <div>
-                                <button class="btn btn-sm btn-light ms-2" @click="addLike(trip.tripId)">
+                                <button class="btn btn-sm btn-light ms-2" @click.stop="addLike(trip.tripId)">
                                     ❤ {{ trip.likes }}
                                 </button>
                             </div>
