@@ -29,6 +29,16 @@ public class TripDetailController {
         );
     }
 
+    @PatchMapping(value="",consumes = {"multipart/form-data"})
+    public ResponseEntity<SuccessResp> updateTripDetail(@ModelAttribute CreateTripReq req, HttpServletRequest request) {
+
+        System.out.println(req.toString());
+
+        return ResponseEntity.ok(
+                new SuccessResp(true)
+        );
+    }
+
     @GetMapping("/{tripId}")
     public ResponseEntity<TripDetailDto> getTripDetail(@PathVariable int tripId) {
 
