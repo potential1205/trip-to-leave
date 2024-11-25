@@ -27,4 +27,6 @@ public interface TripDetailMapper {
     void update(Trip trip);
 
     void deleteHashtagsById(int tripId);
+
+    void addOverview(int tripId);
 }
