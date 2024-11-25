@@ -178,64 +178,66 @@ const postImageFile = ref(null);
 
 // 정보 불러오기
 const album = ref({
-  id: '',
-  title: '',
-  dateRange: '',
-  startDate:'',
-  endDate:'',
-  author: '',
-  markdown: '',
-  imageUrl: '',
-  memberId: 0,
-  hashtags: [],
-  headings:''
+    id: '',
+    title: '',
+    dateRange: '',
+    startDate: '',
+    endDate: '',
+    author: '',
+    markdown: '',
+    imageUrl: '',
+    memberId: 0,
+    hashtags: [],
+    headings: ''
 });
 
 const moveToDetail = () => {
-  const tripId = route.params.id; // 라우트에서 tripId 가져오기
-  router.push(`/main/album/${tripId}`);
+    const tripId = route.params.id; // 라우트에서 tripId 가져오기
+    router.push(`/main/album/${tripId}`);
 };
 
 
 // API 호출 및 데이터 업데이트
 const fetchAlbumDetail = async () => {
-  try {
-    const tripId = route.params.id; // 라우트에서 ID 가져오기
-    const response = await axios.get(`http://localhost:8080/tripdetail/${tripId}`); // API 호출
-    const data = response.data;
-    console.log('API 호출 성공:', data);
+    try {
+        const tripId = route.params.id; // 라우트에서 ID 가져오기
+        const response = await axios.get(`http://localhost:8080/tripdetail/${tripId}`); // API 호출
+        const data = response.data;
+        console.log('API 호출 성공:', data);
 
-    // 데이터 매핑
-    album.value = {
-      id: tripId,
-      title: data.title,
-      dateRange: `${data.startAt} ~ ${data.endAt}`, // 날짜 범위 포맷
-      startDate: data.startAt,
-      endDate: data.endAt,
-      author: data.author,
-      markdown: data.content || '내용이 없습니다.',
-      imageUrl: data.coverImage.filePath,
-      memberId: data.memberId,
-      images: data.images,
-      hashtags: data.hashtagList,
-      headings: data.headings
-    };
+        // 데이터 매핑
+        album.value = {
+            id: tripId,
+            title: data.title,
+            dateRange: `${data.startAt} ~ ${data.endAt}`, // 날짜 범위 포맷
+            startDate: data.startAt,
+            endDate: data.endAt,
+            author: data.author,
+            markdown: data.content || '내용이 없습니다.',
+            imageUrl: data.coverImage.filePath,
+            memberId: data.memberId,
+            images: data.images,
+            hashtags: data.hashtagList,
+            headings: data.headings
+        };
 
-    startDate.value = album.value.startDate;
-    endDate.value = album.value.endDate;
-    postTitle.value = album.value.title;
-    hashtags.value = album.value.hashtags;
-    headings.value = JSON.parse(album.value.headings);
-    postImage.value = album.value.imageUrl;
-    authorName.value = album.value.author;
+        startDate.value = album.value.startDate;
+        endDate.value = album.value.endDate;
+        postTitle.value = album.value.title;
+        hashtags.value = album.value.hashtags;
+        headings.value = JSON.parse(album.value.headings);
+        postImage.value = album.value.imageUrl;
+        authorName.value = album.value.author;
 
-  } catch (error) {
-    console.error('API 호출 중 오류 발생:', error);
-  }
+        markdown.value = mapMarkdownImages(album.value.markdown, [...album.value.images]);
+
+    } catch (error) {
+        console.error('API 호출 중 오류 발생:', error);
+    }
 };
 
 onMounted(() => {
-  fetchAlbumDetail();
+    fetchAlbumDetail();
 });
 
 
@@ -299,6 +301,17 @@ const createTrip = async () => {
     }
 };
 
+const mapMarkdownImages = (markdown, images) => {
+    // 정규식을 이용해 Markdown 이미지 태그 탐지
+    return markdown.replace(/!\[.*?\]\((.*?)\)/g, (match, src, offset) => {
+        // 매핑 기준: Markdown의 순서대로 images 배열의 filePath 사용
+        const image = images.shift(); // 배열에서 첫 번째 이미지 가져오기
+        if (image && image.filePath) {
+            return `![이미지 설명](${image.filePath})`; // 새로운 filePath로 대체
+        }
+        return match; // 매핑할 이미지가 없으면 원래 태그 반환
+    });
+};
 
 
 // 해시태그 관련 상태
@@ -433,15 +446,17 @@ const headings = ref([]);
 
 // `watchEffect`로 `headings` 업데이트
 watchEffect(() => {
-    const lines = markdown.value.split('\n');
-    headings.value = lines
-        .filter((line) => line.startsWith('#'))
-        .map((line) => {
-            const level = line.match(/^#+/)[0].length;
-            const text = line.replace(/^#+\s*/, '');
-            const id = text.toLowerCase().replace(/ /g, '-');
-            return { level, text, id, locations: [] }; // locations 필드 포함
-        });
+    if (!headings.value.length || headings.value.some((h) => !h.locations)) {
+        const lines = markdown.value.split('\n');
+        headings.value = lines
+            .filter((line) => line.startsWith('#'))
+            .map((line) => {
+                const level = line.match(/^#+/)[0].length;
+                const text = line.replace(/^#+\s*/, '');
+                const id = text.toLowerCase().replace(/ /g, '-');
+                return { level, text, id, locations: [] }; // 초기화된 locations
+            });
+    }
 });
 
 // 목차 스크롤
