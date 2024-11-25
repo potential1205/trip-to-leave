@@ -49,14 +49,17 @@
 
                     <!-- 카드 상세 -->
                     <div class="card-details d-flex flex-column p-3">
-                        <h5 class="text-center fw-bold text-truncate" style="font-size: 1.3rem;">
+                        <h5 class="text-center fw-bold text-truncate" style="font-size: 1.2rem;">
                             {{ trip.title }}
                         </h5>
                         <p class="text-center text-muted" style="font-size: 0.9rem;">
                             {{ formatDates(trip.startAt, trip.endAt) }}
                         </p>
-                        <p class="text-start text-muted" style="font-size: 0.8rem;">
-                            {{ trip.hashtags && trip.hashtags.length > 0 ? trip.hashtags.join(', ') : '#태그없음' }}
+                        <p class="text-start text-muted ms-4" style="font-size: 0.8rem;">
+                            <!-- {{ trip.hashtags && trip.hashtags.length > 0 ? trip.hashtags.join(', ') : '#태그없음' }} -->
+                            <span v-for="(hashtag, index) in trip.hashtags" :key="index" class="hashtag">
+                                #{{ hashtag }}
+                            </span>
                         </p>
                         <div class="d-flex justify-content-between align-items-center mt-auto">
                             <div>

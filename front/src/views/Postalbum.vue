@@ -70,6 +70,7 @@
                     <button class="btn btn-success" :class="{ active: isPreview }" @click="showPreview">
                         미리보기
                     </button>
+                    <button class="btn btn-success mx-2" @click="createTrip">작성 완료</button>
                 </div>
 
                 <!-- 기본 정보 작성 -->
@@ -159,11 +160,6 @@
                 <div class="col-8 d-flex flex-column m-0 p-3 border">
                     <h4>장소 상세 정보</h4>
                     <LocationDetails :location="selectedLocationDetails" />
-                </div>
-
-                <!-- 게시글 작성 완료 버튼 -->
-                <div class="text-center mt-4">
-                    <button class="btn btn-success" @click="createTrip">작성 완료</button>
                 </div>
             </div>
         </div>
