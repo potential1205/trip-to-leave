@@ -14,7 +14,8 @@
                         <!-- 장소 목록 표시 -->
                         <ul>
                             <li v-for="location in item.locations" :key="location">
-                                <span @click="selectDetailLocation(location)" style="cursor: pointer;">{{ location.title }}</span>
+                                <span @click="selectDetailLocation(location)" style="cursor: pointer;">{{ location.title
+                                    }}</span>
                                 <button class="btn btn-danger btn-sm ms-2"
                                     @click="removeLocation(index, locIndex)">삭제</button>
                             </li>
@@ -175,7 +176,7 @@ import { ref, computed, watchEffect } from 'vue';
 import { marked } from 'marked';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import LocationDetails from "@/components/LocationDetails.vue"; 
+import LocationDetails from "@/components/LocationDetails.vue";
 
 const router = useRouter();
 const postImageFile = ref(null);
@@ -430,7 +431,7 @@ const selectDetailLocation = async (location) => {
     // 데이터 매핑 및 기본값 설정
     const selectedLocationData = {
         title: location.title || "제목 없음", // title 기본값 설정
-        lat: location.latitude !== undefined ? location.latitude : null, /
+        lat: location.latitude !== undefined ? location.latitude : null,
         lng: location.longitude !== undefined ? location.longitude : null, // longitude 값을 lng에 매핑
         addr1: location.addr1 || "주소 정보 없음", // 상세 주소 추가
         firstImage1: location.firstImage1 || "", // 이미지 기본값 설정
