@@ -14,7 +14,8 @@
                         <!-- 장소 목록 표시 -->
                         <ul>
                             <li v-for="location in item.locations" :key="location">
-                                <span @click="selectDetailLocation(location)" style="cursor: pointer;">{{ location.title }}</span>
+                                <span @click="selectDetailLocation(location)" style="cursor: pointer;">{{ location.title
+                                    }}</span>
                                 <button class="btn btn-danger btn-sm ms-2"
                                     @click="removeLocation(index, locIndex)">삭제</button>
                             </li>
@@ -155,7 +156,10 @@
                 </div>
 
                 <!-- 추가된 장소 상세 정보 섹션 -->
-                <LocationDetailsModal :isOpen="isLocationModalOpen" :location="selectedLocationDetails" @close="closeLocationModal"/>
+                <div class="col-8 d-flex flex-column m-0 p-3 border">
+                    <h4>장소 상세 정보</h4>
+                    <LocationDetails :location="selectedLocationDetails" />
+                </div>
 
                 <!-- 게시글 작성 완료 버튼 -->
                 <div class="text-center mt-4">
@@ -172,24 +176,10 @@ import { ref, computed, watchEffect } from 'vue';
 import { marked } from 'marked';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import LocationDetailsModal from "@/components/LocationDetailsModal.vue";
+import LocationDetails from "@/components/LocationDetails.vue";
 
 const router = useRouter();
 const postImageFile = ref(null);
-
-
-const isLocationModalOpen = ref(false);
-const selectedLocationDetails = ref(null);
-
-const openLocationModal = (location) => {
-    selectedLocationDetails.value = location; // 가져온 데이터를 모달에 전달
-    isLocationModalOpen.value = true; // 모달 열기
-};
-
-const closeLocationModal = () => {
-  isLocationModalOpen.value = false;
-  selectedLocationDetails.value = null;
-};
 
 const createTrip = async () => {
     // 기본 데이터 검증
@@ -435,61 +425,54 @@ const cancelLocationSelection = () => {
 
 // gpt
 const isLoadingDetails = ref(false); // 로딩 상태 추가
-
+const selectedLocationDetails = ref(null);
 
 const selectDetailLocation = async (location) => {
-    console.log("선택된 장소:", location);
-
-    // 기본 데이터 매핑
+    // 데이터 매핑 및 기본값 설정
     const selectedLocationData = {
-        title: location.title || "제목 없음",
+        title: location.title || "제목 없음", // title 기본값 설정
         lat: location.latitude !== undefined ? location.latitude : null,
-        lng: location.longitude !== undefined ? location.longitude : null,
-        addr1: location.addr1 || "주소 정보 없음",
-        firstImage1: location.firstImage1 || "",
+        lng: location.longitude !== undefined ? location.longitude : null, // longitude 값을 lng에 매핑
+        addr1: location.addr1 || "주소 정보 없음", // 상세 주소 추가
+        firstImage1: location.firstImage1 || "", // 이미지 기본값 설정
     };
 
-    // 위도와 경도 정보 검증
+    console.log("Location data being sent:", selectedLocationData);
+
+    // 필수 데이터 검증
     if (!selectedLocationData.lat || !selectedLocationData.lng) {
-        console.error("위도와 경도 정보가 누락되었습니다.");
-        alert("위도와 경도 정보가 없어서 상세 정보를 가져올 수 없습니다.");
+        console.error("위도와 경도가 누락되었습니다.");
+        alert("위도와 경도 정보가 누락되어 상세 정보를 가져올 수 없습니다.");
         return;
     }
 
-    // 로딩 상태 활성화
     isLoadingDetails.value = true;
 
     try {
-        // 서버에 API 요청
+        // 서버로 데이터 전송
         const response = await axios.post(
             "http://localhost:8080/attractions/details",
             selectedLocationData
         );
 
-        // 응답 데이터를 selectedLocationDetails에 저장
+        // 서버 응답을 상태에 저장
         selectedLocationDetails.value = response.data;
-        console.log("가져온 상세 정보:", response.data);
-
     } catch (error) {
-        console.error("데이터 가져오기 실패:", error);
+        console.error("Error fetching location details:", error);
 
-        // 요청 실패 시 기본값 설정
+        // 기본 설명 추가
         selectedLocationDetails.value = {
             title: selectedLocationData.title,
             lat: selectedLocationData.lat,
             lng: selectedLocationData.lng,
             addr1: selectedLocationData.addr1,
             firstImage1: selectedLocationData.firstImage1,
-            description: "상세 정보를 가져오지 못했습니다.",
+            description: "상세 정보를 가져오는 데 실패했습니다.",
         };
     } finally {
-        // 로딩 상태 해제 및 모달 열기
         isLoadingDetails.value = false;
-        openLocationModal(selectedLocationDetails.value); // 모달 열기
     }
 };
-
-
 
 
 
