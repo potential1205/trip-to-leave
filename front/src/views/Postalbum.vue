@@ -176,7 +176,7 @@ import { ref, computed, watchEffect } from 'vue';
 import { marked } from 'marked';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import LocationDetails from "@/components/LocationDetails.vue";
+import LocationDetails from "@/components/LocationDetailsModal.vue";
 
 const router = useRouter();
 const postImageFile = ref(null);
