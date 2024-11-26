@@ -1,0 +1,232 @@
+@startuml
+
+' Define the package structure for better organization
+package "com.example.domain" {
+
+    class Member {
+        + int memberId
+        + String username
+        + String email
+        + String password
+        + String role
+        + Timestamp createdAt
+    }
+
+    class Article {
+        + int articleId
+        + int memberId
+        + String title
+        + String category
+        + Text content
+        + Timestamp createdAt
+        + Timestamp updatedAt
+        + int overview
+    }
+
+    class ArticleFile {
+        + int fileId
+        + int articleId
+        + String fileName
+        + String filePath
+        + String contentType
+    }
+
+    class Sido {
+        + int no
+        + int sidoCode
+        + String sidoName
+    }
+
+    class Gugun {
+        + int no
+        + int sidoCode
+        + int gugunCode
+        + String gugunName
+    }
+
+    class ContentType {
+        + int contentTypeId
+        + String contentTypeName
+    }
+
+    class Attraction {
+        + int attractionId
+        + int contentId
+        + String title
+        + int contentTypeId
+        + int areaCode
+        + int siGunGuCode
+        + String firstImage1
+        + String firstImage2
+        + int mapLevel
+        + Decimal latitude
+        + Decimal longitude
+        + String tel
+        + String addr1
+        + String addr2
+        + String homepage
+        + String overview
+    }
+
+    class Trip {
+        + int tripId
+        + int memberId
+        + String title
+        + Text content
+        + Timestamp createdAt
+        + Timestamp updatedAt
+        + int likes
+        + int overview
+        + DateTime startAt
+        + DateTime endAt
+        + String coverImage
+        + Text headings
+    }
+
+    class TripFile {
+        + int fileId
+        + int tripId
+        + String fileName
+        + String filePath
+        + String contentType
+        + String fileType
+        + int sequence
+    }
+
+    class Hashtag {
+        + int hashtagId
+        + String hashtagContent
+    }
+
+    class TripHashtag {
+        + int tripId
+        + int hashtagId
+    }
+
+    class Like {
+        + int likeId
+        + int tripId
+        + int memberId
+        + Timestamp createdAt
+    }
+
+    class TripsAttraction {
+        + int tripAttractionId
+        + int tripId
+        + int attractionId
+        + Timestamp createdAt
+    }
+
+    ' Define relationships based on foreign keys
+    Member "1" --> "0..*" Article : creates
+    Article "1" --> "0..*" ArticleFile : has
+    Sido "1" --> "0..*" Gugun : contains
+    ContentType "1" --> "0..*" Attraction : type
+    Sido "1" --> "0..*" Attraction : area
+    Gugun "1" --> "0..*" Attraction : siGunGu
+    Member "1" --> "0..*" Trip : owns
+    Trip "1" --> "0..*" TripFile : contains
+    Trip "1" --> "0..*" TripsAttraction : includes
+    Attraction "1" --> "0..*" TripsAttraction : included in
+    Trip "0..*" --> "0..*" Hashtag : tagged with
+    Hashtag "0..*" --> "0..*" Trip : tagging
+    Trip "1" --> "0..*" Like : receives
+    Member "1" --> "0..*" Like : gives
+}
+
+package "com.example.domain.article.service" {
+
+    class ArticleServiceImpl {
+        - ArticleMapper articleMapper
+        - ArticleFileMapper articleFileMapper
+        + ReadArticlesResp readArticles(int page, int size)
+        + void createArticle(CreateArticleReq req, HttpServletRequest request)
+        + ReadArticleResp readArticle(int articleId)
+        + void deleteArticle(int articleId)
+        + void updateArticle(int articleId, UpdateArticleReq req, HttpServletRequest request)
+    }
+
+}
+
+package "com.example.domain.attraction.service" {
+
+    class AttractionServiceImpl {
+        - AttractionMapper attractionMapper
+        - AttractionDtoMapper dtoMapper
+        + List<AttractionDto> getAreaAttractions(Integer areaCode)
+        + List<AttractionDto> getSigunguAttractions(Integer areaCode, Integer sigunguCode)
+        + List<AttractionDto> getAreaContentAttractions(Integer areaCode, Integer contentTypeId)
+        + List<AttractionDto> getSigunguContentAttractions(Integer areaCode, Integer sigunguCode, Integer contentTypeId)
+        + List<AttractionDto> searchAttractions(Integer areacode, Integer sigungucode, Integer contenttypeid, String keyword)
+        + AttractionDto getAttractionById(Integer id)
+        + List<AttractionDto> getAreaAttractionsByKeyword(String keyword)
+    }
+
+}
+
+package "com.example.domain.member.service" {
+
+    class MemberServiceImpl {
+        - StringRedisTemplate redisTemplate
+        - JavaMailSender javaMailSender
+        - MemberMapper memberMapper
+        - HttpSession session
+        + void joinEmailAuth(String email)
+        + void join(String email, String authCode, String username, String password)
+        + Member login(String email, String password)
+        + void passwordResetEmailAuth(String email)
+        + void passwordReset(String email, String authCode, String password)
+        + void delete()
+        + void update(String username)
+        + void updatePassword(String password, String newPassword)
+    }
+
+}
+
+package "com.example.domain.trip.service" {
+
+    class TripArticleServiceImpl {
+        - TripArticleMapper tripArticleMapper
+        + List<TripArticleDto> getAllTripArticles()
+        + TripArticleDto getTripArticleById(int id)
+        + List<TripArticleDto> searchTripArticles(String keyword)
+        + List<TripArticleDto> searchArticlesByHashtag(String hashtag)
+        + void addLikeToTripArticle(int id)
+        + void addLikeToTripArticle(int tripId, int memberId)
+        + void incrementViewCount(int id)
+        + List<TripArticleDto> getArticlesByMemberId(int memberId)
+    }
+
+}
+
+package "com.example.domain.tripdetail.service" {
+
+    class TripDetailServiceImpl {
+        - TripDetailMapper tripDetailMapper
+        - TripFileMapper tripFileMapper
+        - TripAttractionMapper tripAttractionMapper
+        + void createTripDetail(CreateTripReq req, HttpServletRequest request)
+        + TripDetailDto getTripDetail(int tripId)
+        + void deleteTripDetail(int tripId, HttpServletRequest request)
+        + void updateTripDetail(UpdateTripReq req, HttpServletRequest request)
+    }
+
+}
+
+' Define service class dependencies
+ArticleServiceImpl --> ArticleMapper
+ArticleServiceImpl --> ArticleFileMapper
+AttractionServiceImpl --> AttractionMapper
+AttractionServiceImpl --> AttractionDtoMapper
+MemberServiceImpl --> MemberMapper
+MemberServiceImpl --> StringRedisTemplate
+MemberServiceImpl --> JavaMailSender
+MemberServiceImpl --> HttpSession
+TripArticleServiceImpl --> TripArticleMapper
+TripDetailServiceImpl --> TripDetailMapper
+TripDetailServiceImpl --> TripFileMapper
+TripDetailServiceImpl --> TripAttractionMapper
+
+' Additional relationships or dependencies can be added here as needed
+
+@enduml
