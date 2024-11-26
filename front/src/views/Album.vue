@@ -23,7 +23,7 @@
         </div>
 
         <!-- 카드 목록 -->
-        <div class="cards-container">
+        <div class="cards-container mb-5">
             <!-- 추가 카드 -->
             <div class="card-wrapper">
                 <router-link to="/main/postalbum" class="nav-link">

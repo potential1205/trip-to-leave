@@ -464,31 +464,31 @@ const renderedMarkdown = computed(() => marked(markdown.value));
 const headings = ref([]);
 
 // `watchEffect`로 `headings` 업데이트
-// watchEffect(() => {
-//     if (!headings.value.length || headings.value.some((h) => !h.locations)) {
-//         const lines = markdown.value.split('\n');
-//         headings.value = lines
-//             .filter((line) => line.startsWith('#'))
-//             .map((line) => {
-//                 const level = line.match(/^#+/)[0].length;
-//                 const text = line.replace(/^#+\s*/, '');
-//                 const id = text.toLowerCase().replace(/ /g, '-');
-//                 return { level, text, id, locations: [] }; // 초기화된 locations
-//             });
-//     }
-// });
-
 watchEffect(() => {
-    const lines = markdown.value.split('\n');
-    headings.value = lines
-        .filter((line) => line.startsWith('#'))
-        .map((line) => {
-            const level = line.match(/^#+/)[0].length;
-            const text = line.replace(/^#+\s*/, '');
-            const id = text.toLowerCase().replace(/ /g, '-');
-            return { level, text, id, locations: [] }; // locations 필드 포함
-        });
+    if (!headings.value.length || headings.value.some((h) => !h.locations)) {
+        const lines = markdown.value.split('\n');
+        headings.value = lines
+            .filter((line) => line.startsWith('#'))
+            .map((line) => {
+                const level = line.match(/^#+/)[0].length;
+                const text = line.replace(/^#+\s*/, '');
+                const id = text.toLowerCase().replace(/ /g, '-');
+                return { level, text, id, locations: [] }; // 초기화된 locations
+            });
+    }
 });
+
+// watchEffect(() => {
+//     const lines = markdown.value.split('\n');
+//     headings.value = lines
+//         .filter((line) => line.startsWith('#'))
+//         .map((line) => {
+//             const level = line.match(/^#+/)[0].length;
+//             const text = line.replace(/^#+\s*/, '');
+//             const id = text.toLowerCase().replace(/ /g, '-');
+//             return { level, text, id, locations: [] }; // locations 필드 포함
+//         });
+// });
 
 
 

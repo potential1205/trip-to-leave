@@ -153,7 +153,7 @@ public class AttractionController {
 
         System.out.println(prompt);
         Map<String, Object> body = new HashMap<>();
-        body.put("model", "gpt-4");
+        body.put("model", "gpt-4o-mini");
         body.put("messages", List.of(
                 Map.of("role", "system", "content", "당신은 장소 정보를 제공하는 유용한 한국어 도우미입니다."),
                 Map.of("role", "user", "content", prompt)

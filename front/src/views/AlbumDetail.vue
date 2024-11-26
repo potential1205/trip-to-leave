@@ -22,8 +22,6 @@
       </div>
 
       <div class="col-8 d-flex flex-column m-0 p-0 border overflow-y-scroll" style="height: 90vh;">
-
-
         <div class="album-detail-section border p-3">
           <h1 class="text-center">{{ album.title }}</h1>
           <p class="text-center fw-bold">{{ album.dateRange }}</p>
@@ -40,8 +38,8 @@
 
         <!-- 버튼 섹션 -->
         <div class="button-section mb-4 text-center mt-3">
-          <button class="btn btn-primary me-3" @click="editAlbum">수정</button>
-          <button class="btn btn-danger me-3" @click="deleteAlbum">삭제</button>
+          <button v-if="isAuthor" class="btn btn-primary me-3" @click="editAlbum">수정</button>
+          <button v-if="isAuthor" class="btn btn-danger me-3" @click="deleteAlbum">삭제</button>
           <button class="btn btn-secondary" @click="goToList">목록으로</button>
         </div>
       </div>
@@ -60,8 +58,21 @@ import axios from 'axios';
 const route = useRoute();
 const router = useRouter();
 const isAuthor = ref(false);
+const authorId = ref(0);
+
+const scrollToHeading = () => {
+  // 스크롤 대상이 되는 col-8 div 가져오기
+  const scrollContainer = document.querySelector('.col-8.d-flex');
+
+  // 스크롤을 절반 내리도록 처리
+  if (scrollContainer) {
+    const scrollAdjustment = scrollContainer.scrollTop + scrollContainer.clientHeight / 2;
+    scrollContainer.scrollTo({ top: scrollAdjustment, behavior: 'smooth' });
+  }
+};
 
 const checkSession = async (findId) => {
+  console.log(findId);
   try {
     const response = await axios.get(`http://localhost:8080/member/session`, {
       withCredentials: true, // 세션 쿠키를 포함
@@ -70,8 +81,14 @@ const checkSession = async (findId) => {
     // 서버 응답 처리
     if (response.data != null) {
       // 세션이 유효한 경우
-      console.log("세션 유효:", response.data);
-      isAuthor.value = findId === response.data; // 작성자인지 여부 확인
+      console.log("게시글 작성자 번호", findId);
+      console.log("세션 번호:", response.data);
+      if (findId === response.data) {
+        isAuthor.value = true;
+      } else {
+        isAuthor.value = false;
+      }
+      console.log("isAuthor:", isAuthor.value);
 
     } else {
 
@@ -144,7 +161,6 @@ const fetchAlbumDetail = async () => {
 
     // 데이터 매핑
     album.value = {
-      id: tripId,
       title: data.title,
       dateRange: `${data.startAt} ~ ${data.endAt}`, // 날짜 범위 포맷
       author: data.author,
@@ -154,13 +170,15 @@ const fetchAlbumDetail = async () => {
       images: data.images
     };
 
+    console.log(album.value.memberId);
+    checkSession(album.value.memberId);
     updateMarkdownImages();
 
     // headings를 JSON 객체로 변환
     if (data.headings) {
       try {
         album.value.headings = JSON.parse(data.headings);
-        console.log('headings 객체로 변환 성공:', album.value.headings);
+
       } catch (error) {
         console.error('headings JSON 변환 실패:', error);
         album.value.headings = []; // 변환 실패 시 빈 배열 할당
@@ -184,7 +202,7 @@ const fetchAlbumDetail = async () => {
 
 onMounted(() => {
   fetchAlbumDetail();
-  checkSession(album.value.memberId);
+  checkSession();
 });
 
 //
@@ -209,8 +227,6 @@ const updateMarkdownImages = () => {
 
   // 갱신된 마크다운을 album.value에 반영
   album.value.markdown = markdown;
-
-  console.log("Updated Markdown:", markdown); // 디버깅용 로그
 };
 
 const userName = ref(''); // 사용자 이름을 저장할 변수
